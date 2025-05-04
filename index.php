@@ -165,6 +165,14 @@
       <a href="/bouncing-ball/">View Project</a>
     </article>
 
+    <!-- ToDo App -->
+    <article class="card">
+      <img src="https://picsum.photos/seed/todo-app/300/100" alt="ToDo App">
+      <h2>ToDo App</h2>
+      <p>Manage tasks and mark them off as you complete them.</p>
+      <a href="/todo-app/">View Project</a>
+    </article>
+
   </main>
 </body>
 </html>
