@@ -114,6 +114,38 @@
       <a href="/piano/">View Project</a>
     </article>
 
+    <!-- Particle Play -->
+    <article class="card">
+      <img src="https://picsum.photos/seed/particle-play/300/200" alt="Particle Play">
+      <h2>Particle Play</h2>
+      <p>Experiment with interactive particle systems and physics.</p>
+      <a href="/particle-play/">View Project</a>
+    </article>
+
+    <!-- Maze -->
+    <article class="card">
+      <img src="https://picsum.photos/seed/maze/300/200" alt="Maze">
+      <h2>Maze</h2>
+      <p>Navigate through generated mazes to find the exit.</p>
+      <a href="/maze/">View Project</a>
+    </article>
+
+    <!-- NATO Flashcards -->
+    <article class="card">
+      <img src="https://picsum.photos/seed/nato-flashcards/300/200" alt="NATO Flashcards">
+      <h2>NATO Flashcards</h2>
+      <p>Practice the NATO phonetic alphabet with interactive flashcards.</p>
+      <a href="/nato-flashcards/">View Project</a>
+    </article>
+
+    <!-- Stardew Friends -->
+    <article class="card">
+      <img src="https://picsum.photos/seed/stardew-friends/300/200" alt="Stardew Friends">
+      <h2>Stardew Friends</h2>
+      <p>Track and manage your friendships in Stardew Valley.</p>
+      <a href="/stardew-friends/">View Project</a>
+    </article>
+
   </main>
 </body>
 </html>
