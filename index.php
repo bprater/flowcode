@@ -1,12 +1,119 @@
-<h1>Flowcode GO!</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ben's Flow Code Apps</title>
+  <!-- Pixel-style retro font -->
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    /* Global resets */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
 
-<hr/>
-<h2>Typing test</h2>
-<p><a href="/typing-test/index.php">See it now...</a></p>
+    /* Muted Pitfall-inspired palette */
+    body {
+      background: #2e1e00; /* Deep brown ground */
+      color: #c0a080; /* Soft tan text */
+      font-family: 'Press Start 2P', cursive;
+      line-height: 1.4;
+      padding: 1rem;
+    }
 
-<hr/>
+    /* Header styling */
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    header h1 {
+      font-size: 1.5rem;
+      text-shadow: 0 0 5px #8b5a2b; /* Muted brown glow */
+    }
 
-<h2>Letter match</h2>
-<p><a href="/letter-match/index.php">See it now...</a></p>
+    /* Container for entries */
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
 
-<hr/>
+    /* Card styling */
+    .card {
+      border: 2px solid #4b6220; /* Muted olive green */
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      background: #705e3b; /* Lighter muted brown */
+      align-items: center;
+    }
+
+    .card img {
+      width: auto;
+      max-width: 300px; /* Smaller main image */
+      border: 2px solid #c0a080; /* Soft tan border */
+    }
+
+    .card h2 {
+      font-size: 1.2rem; /* Larger app name */
+      color: #ecd078; /* Pale yellow standout */
+    }
+
+    .card p {
+      font-size: 0.8rem;
+      text-align: center;
+    }
+
+    .card a {
+      font-size: 0.8rem;
+      text-decoration: none;
+      color: #a09060; /* Muted gold link */
+      text-shadow: 0 0 3px #a09060;
+    }
+
+    /* Link hover glow */
+    .card a:hover {
+      text-shadow: 0 0 7px #a09060;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Ben's Flow Code Apps</h1>
+  </header>
+  <main class="container">
+    <!-- Typing Test -->
+    <article class="card">
+      <img src="https://picsum.photos/seed/typing-test/300/200" alt="Typing Test">
+      <h2>Typing Test</h2>
+      <p>Test your typing speed and accuracy with real-time feedback.</p>
+      <a href="/typing-test/">View Project</a>
+    </article>
+
+    <!-- Balloon Pop -->
+    <article class="card">
+      <img src="https://picsum.photos/seed/balloon-pop/300/200" alt="Balloon Pop">
+      <h2>Balloon Pop</h2>
+      <p>Pop balloons before they float away in this fun, fast-paced game.</p>
+      <a href="/balloon-pop/">View Project</a>
+    </article>
+
+    <!-- Letter Match -->
+    <article class="card">
+      <img src="https://picsum.photos/seed/letter-match/300/200" alt="Letter Match">
+      <h2>Letter Match</h2>
+      <p>Match letters to their correct positions before time runs out.</p>
+      <a href="/letter-match/">View Project</a>
+    </article>
+
+    <!-- Piano -->
+    <article class="card">
+      <img src="https://picsum.photos/seed/piano/300/200" alt="Piano">
+      <h2>Piano</h2>
+      <p>Play tunes on a virtual piano keyboard with responsive keys.</p>
+      <a href="/piano/">View Project</a>
+    </article>
+
+  </main>
+</body>
+</html>

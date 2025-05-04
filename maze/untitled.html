@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>40x40 Maze Solver</title>
+  <style>
+    canvas { border: 1px solid black; }
+    pre { background: #f0f0f0; padding: 1em; max-height: 300px; overflow: auto; }
+  </style>
+</head>
+<body>
+  <h1>40x40 Maze Solver</h1>
+  <input type="file" id="file-input" accept="application/json">
+  <p id="timer">Loading Time: 0 ms</p>
+  <canvas id="maze" width="800" height="800"></canvas>
+
+  <script>
+    const canvas = document.getElementById("maze");
+    const ctx = canvas.getContext("2d");
+    const timerDisplay = document.getElementById("timer");
+    const fileInput = document.getElementById("file-input");
+    let cols = 40;
+    let rows = 40;
+    let cellSize;
+    let grid = [];
+    let solver = null;
+
+    class Cell {
+      constructor(x, y, walls) {
+        this.x = x;
+        this.y = y;
+        this.walls = walls || [true, true, true, true];
+      }
+
+      draw() {
+        const x = this.x * cellSize;
+        const y = this.y * cellSize;
+
+        ctx.strokeStyle = "black";
+        ctx.lineWidth = 2;
+
+        if (this.walls[0]) drawLine(x, y, x + cellSize, y);           // top
+        if (this.walls[1]) drawLine(x + cellSize, y, x + cellSize, y + cellSize); // right
+        if (this.walls[2]) drawLine(x + cellSize, y + cellSize, x, y + cellSize); // bottom
+        if (this.walls[3]) drawLine(x, y + cellSize, x, y);           // left
+      }
+    }
+
+    function drawLine(x1, y1, x2, y2) {
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+    }
+
+    function drawMaze() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (const cell of grid) cell.draw();
+    }
+
+    fileInput.addEventListener("change", (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const startTime = performance.now();
+
+        try {
+          const jsonData = JSON.parse(e.target.result);
+          cols = jsonData.cols;
+          rows = jsonData.rows;
+          cellSize = canvas.width / cols;
+          grid = jsonData.maze.map(cell => new Cell(cell.x, cell.y, cell.walls));
+
+          drawMaze();
+
+          const endTime = performance.now();
+          const elapsed = Math.round(endTime - startTime);
+          timerDisplay.textContent = `Loading Time: ${elapsed} ms`;
+
+          solver = new MazeSolver(0, 0); // Start top-left
+          animate();
+        } catch (error) {
+          alert("Invalid JSON file.");
+          console.error(error);
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    function index(x, y) {
+      if (x < 0 || y < 0 || x >= cols || y >= rows) return -1;
+      return x + y * cols;
+    }
+
+    class MazeSolver {
+      constructor(startX, startY) {
+        this.stack = [{ x: startX, y: startY }];
+        this.visited = new Set();
+        this.current = null;
+      }
+
+      step() {
+        if (this.stack.length === 0) return;
+
+        if (this.current) {
+          // Redraw previous cell to erase dot
+          const prevCell = grid[index(this.current.x, this.current.y)];
+          prevCell.draw();
+        }
+
+        this.current = this.stack.pop();
+        const key = `${this.current.x},${this.current.y}`;
+
+        if (this.visited.has(key)) return;
+        this.visited.add(key);
+
+        const cell = grid[index(this.current.x, this.current.y)];
+        if (!cell) return;
+
+        const x = this.current.x * cellSize + cellSize / 2;
+        const y = this.current.y * cellSize + cellSize / 2;
+
+        ctx.fillStyle = "red";
+        ctx.beginPath();
+        ctx.arc(x, y, cellSize / 6, 0, Math.PI * 2);
+        ctx.fill();
+
+        const directions = [
+          { dx: 0, dy: -1, wall: 0 }, // top
+          { dx: 1, dy: 0, wall: 1 },  // right
+          { dx: 0, dy: 1, wall: 2 },  // bottom
+          { dx: -1, dy: 0, wall: 3 }  // left
+        ];
+
+        directions.forEach(({ dx, dy, wall }) => {
+          if (!cell.walls[wall]) {
+            const nx = this.current.x + dx;
+            const ny = this.current.y + dy;
+            const nKey = `${nx},${ny}`;
+            if (!this.visited.has(nKey)) {
+              this.stack.push({ x: nx, y: ny });
+            }
+          }
+        });
+      }
+    }
+
+    function animate() {
+      if (solver) {
+        solver.step();
+        setTimeout(() => requestAnimationFrame(animate), 100); // Slowed down
+      }
+    }
+  </script>
+</body>
+</html>
