@@ -173,6 +173,14 @@
       <a href="/todo-app/">View Project</a>
     </article>
 
+    <!-- Vampire Studs -->
+    <article class="card">
+      <img src="https://picsum.photos/seed/vampire-studs/300/100" alt="Vampire Studs">
+      <h2>Vampire Studs</h2>
+      <p>Collect and battle with vampire-themed stud cards.</p>
+      <a href="/vampire-studs/">View Project</a>
+    </article>
+
   </main>
 </body>
 </html>
