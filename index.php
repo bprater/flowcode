@@ -181,6 +181,14 @@
       <a href="/vampire-studs/">View Project</a>
     </article>
 
+    <!-- Monsters Tower Defense -->
+    <article class="card">
+      <img src="https://picsum.photos/seed/monsters-tower-defense/300/100" alt="Monsters Tower Defense">
+      <h2>Monsters Tower Defense</h2>
+      <p>Defend against waves of monsters with strategic tower placement.</p>
+      <a href="/monsters-tower-defense/">View Project</a>
+    </article>
+
   </main>
 </body>
 </html>
