@@ -13,8 +13,8 @@
 
     /* Muted Pitfall-inspired palette */
     body {
-      background: #2e1e00; /* Deep brown ground */
-      color: #c0a080; /* Soft tan text */
+      background: #2e1e00;
+      color: #c0a080;
       font-family: 'Press Start 2P', cursive;
       line-height: 1.4;
       padding: 1rem;
@@ -27,10 +27,10 @@
     }
     header h1 {
       font-size: 1.5rem;
-      text-shadow: 0 0 5px #8b5a2b; /* Muted brown glow */
+      text-shadow: 0 0 5px #8b5a2b;
     }
 
-    /* Container for entries - two columns */
+    /* Two-column grid container */
     .container {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -41,25 +41,24 @@
 
     /* Card styling */
     .card {
-      border: 2px solid #4b6220; /* Muted olive green */
+      border: 2px solid #4b6220;
+      background: #705e3b;
       padding: 1rem;
-      background: #705e3b; /* Lighter muted brown */
       display: flex;
       flex-direction: column;
-      gap: 0.5rem;
       align-items: center;
+      gap: 0.5rem;
     }
 
     .card img {
-      width: auto;
-      max-width: 300px; /* Max width */
-      max-height: 100px; /* Half as tall */
-      border: 2px solid #c0a080; /* Soft tan border */
+      max-width: 300px;
+      max-height: 100px;
+      border: 2px solid #c0a080;
     }
 
     .card h2 {
-      font-size: 1.2rem; /* Larger app name */
-      color: #ecd078; /* Pale yellow standout */
+      font-size: 1.2rem;
+      color: #ecd078;
     }
 
     .card p {
@@ -70,11 +69,10 @@
     .card a {
       font-size: 0.8rem;
       text-decoration: none;
-      color: #a09060; /* Muted gold link */
+      color: #a09060;
       text-shadow: 0 0 3px #a09060;
     }
 
-    /* Link hover glow */
     .card a:hover {
       text-shadow: 0 0 7px #a09060;
     }
@@ -213,6 +211,13 @@
       <a href="/asteroidal/">View Project</a>
     </article>
 
+    <!-- Tower Suspense -->
+    <article class="card">
+      <img src="https://picsum.photos/seed/tower-suspense/300/100" alt="Tower Suspense">
+      <h2>Tower Suspense</h2>
+      <p>Build your tower while suspense rises as enemies approach.</p>
+      <a href="/tower-suspense/">View Project</a>
+    </article>
   </main>
 </body>
 </html>
