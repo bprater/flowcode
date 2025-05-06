@@ -165,9 +165,9 @@
         const delta = timestamp - lastTimestamp;
         lastTimestamp = timestamp;
 
-        // Modulate spin speed: normal for 2s, then full for 1s
-        const cycle = timestamp % 3000;
-        const speedFactor = cycle < 2000 ? 1 : 4;
+        // Modulate spin speed: 3s normal, 3s burst at 10×
+        const cycle = timestamp % 6000;
+        const speedFactor = cycle < 3000 ? 1 : 10;
 
         // Update rotation angle
         rotAngle += (delta / 1000) * speedFactor;
