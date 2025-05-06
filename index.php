@@ -189,6 +189,30 @@
       <a href="/monsters-tower-defense/">View Project</a>
     </article>
 
+    <!-- Monster Livery -->
+    <article class="card">
+      <img src="https://picsum.photos/seed/monster-livery/300/100" alt="Monster Livery">
+      <h2>Monster Livery</h2>
+      <p>Design custom liveries for monster trucks and vehicles.</p>
+      <a href="/monster-livery/">View Project</a>
+    </article>
+
+    <!-- Headshot -->
+    <article class="card">
+      <img src="https://picsum.photos/seed/headshot/300/100" alt="Headshot">
+      <h2>Headshot</h2>
+      <p>Generate AI-powered professional headshots with style presets.</p>
+      <a href="/headshot/">View Project</a>
+    </article>
+
+    <!-- Asteroidal -->
+    <article class="card">
+      <img src="https://picsum.photos/seed/asteroidal/300/100" alt="Asteroidal">
+      <h2>Asteroidal</h2>
+      <p>Pilot your ship through an asteroid field and avoid collisions.</p>
+      <a href="/asteroidal/">View Project</a>
+    </article>
+
   </main>
 </body>
 </html>
