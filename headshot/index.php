@@ -21,7 +21,6 @@
       background-color: #444;
       border: 2px solid #fff;
       overflow: hidden;
-      cursor: crosshair;
     }
     #character {
       position: absolute;
@@ -49,11 +48,10 @@
     let targetX = 400;
     let targetY = 20;
 
-    game.addEventListener('mousemove', (e) => {
-      const rect = game.getBoundingClientRect();
-      targetX = e.clientX - rect.left - 40;
-      targetY = rect.bottom - e.clientY - 40;
-    });
+    function setRandomTarget() {
+      targetX = Math.floor(Math.random() * 720); // 800 - character width (80)
+      targetY = Math.floor(Math.random() * 320); // 400 - character height (80)
+    }
 
     function animate() {
       const dx = targetX - positionX;
@@ -63,6 +61,8 @@
       if (distance > 5) {
         positionX += dx / distance * 10;
         positionY += dy / distance * 10;
+      } else {
+        setRandomTarget();
       }
 
       currentImage = 1 - currentImage;
@@ -80,6 +80,7 @@
       character.style.bottom = `${positionY}px`;
     }
 
+    setRandomTarget();
     setInterval(animate, 100);
   </script>
 </body>
