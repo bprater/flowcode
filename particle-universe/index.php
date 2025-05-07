@@ -57,15 +57,15 @@
                 <label for="shapeType">Shape:</label>
                 <select id="shapeType">
                     <option value="cube">Cube</option>
-                    <option value=\"sphere\">Sphere</option>
-                    <option value=\"torus\">Torus</option>
-                    <option value=\"icosahedron\">Icosahedron</option>
-                    <option value=\"cone\">Cone</option>
-                    <option value=\"cylinder\">Cylinder</option>
-                    <option value=\"torusknot\">TorusKnot</option>
-                    <option value=\"dodecahedron\">Dodecahedron</option>
-                    <option value=\"octahedron\">Octahedron</option>
-                    <option value=\"tetrahedron\">Tetrahedron</option>
+                    <option value="sphere">Sphere</option>
+                    <option value="torus">Torus</option>
+                    <option value="icosahedron">Icosahedron</option>
+                    <option value="cone">Cone</option>
+                    <option value="cylinder">Cylinder</option>
+                    <option value="torusknot">TorusKnot</option>
+                    <option value="dodecahedron">Dodecahedron</option>
+                    <option value="octahedron">Octahedron</option>
+                    <option value="tetrahedron">Tetrahedron</option>
                 </select>
             </div>
             <div class="control-group">
@@ -227,6 +227,10 @@
                 particleSystem.material.dispose();
             }
             if (!currentShapeMesh) return;
+            if (!currentShapeMesh.geometry) {
+                console.error("CRITICAL: currentShapeMesh.geometry is null or undefined in regenerateParticles. Cannot generate particles.");
+                return;
+            }
 
             const density = parseInt(uiControls.particleDensity.value);
             const particlePositions = new Float32Array(density * 3);
@@ -246,103 +250,129 @@
                 // which can sometimes cause z-fighting with the wireframe if it were more opaque.
                 const scaleFactor = 0.99; 
 
-                if (shapeType === 'cube') {
-                    const s = shapeGeometry.parameters.width / 2 * scaleFactor;
-                    const face = Math.floor(Math.random() * 6);
-                    const u = (Math.random() - 0.5) * 2 * s;
-                    const v = (Math.random() - 0.5) * 2 * s;
-                    switch (face) {
-                        case 0: x = s; y = u; z = v; break;  // +X
-                        case 1: x = -s; y = u; z = v; break; // -X
-                        case 2: y = s; x = u; z = v; break;  // +Y
-                        case 3: y = -s; x = u; z = v; break; // -Y
-                        case 4: z = s; x = u; y = v; break;  // +Z
-                        case 5: z = -s; x = u; y = v; break; // -Z
-                    }
-                } else if (shapeType === 'sphere' || shapeType === 'icosahedron' || shapeType === 'dodecahedron' || shapeType === 'octahedron' || shapeType === 'tetrahedron') {
-                    const radius = shapeGeometry.parameters.radius * scaleFactor;
-                    const phi = Math.random() * 2 * Math.PI;
-                    const cosTheta = Math.random() * 2 - 1; 
-                    const theta = Math.acos(cosTheta);
-                    x = radius * Math.sin(theta) * Math.cos(phi);
-                    y = radius * Math.sin(theta) * Math.sin(phi);
-                    z = radius * Math.cos(theta);
-                } else if (shapeType === 'torus' || shapeType === 'torusknot') { // TorusKnot will use similar particle distribution
-                    const R = shapeGeometry.parameters.radius * scaleFactor; // Main radius
-                    const r_tube = shapeGeometry.parameters.tube * scaleFactor; // Tube radius
-                    const u_angle = Math.random() * 2 * Math.PI; // Angle around the main ring
-                    const v_angle = Math.random() * 2 * Math.PI; // Angle around the tube cross-section
-                    
-                    // For TorusKnot, p and q affect the path, but for particle distribution,
-                    // we can use the torus formula with the knot's overall radius and tube radius.
-                    x = (R + r_tube * Math.cos(v_angle)) * Math.cos(u_angle);
-                    y = (R + r_tube * Math.cos(v_angle)) * Math.sin(u_angle);
-                    z = r_tube * Math.sin(v_angle);
+                if (!shapeGeometry || !shapeGeometry.parameters) {
+                    console.error(`CRITICAL: shapeGeometry or shapeGeometry.parameters is missing for shapeType: "${shapeType}", particle ${i}. Defaulting position. ShapeGeom:`, shapeGeometry);
+                    x = 0; y = 0; z = 0;
+                } else {
+                    if (shapeType === 'cube') {
+                        if (shapeGeometry.parameters && typeof shapeGeometry.parameters.width === 'number') {
+                            const s = shapeGeometry.parameters.width / 2 * scaleFactor;
+                            const face = Math.floor(Math.random() * 6);
+                            const u = (Math.random() - 0.5) * 2 * s;
+                            const v = (Math.random() - 0.5) * 2 * s;
+                            switch (face) {
+                                case 0: x = s; y = u; z = v; break;  // +X
+                                case 1: x = -s; y = u; z = v; break; // -X
+                                case 2: y = s; x = u; z = v; break;  // +Y
+                                case 3: y = -s; x = u; z = v; break; // -Y
+                                case 4: z = s; x = u; y = v; break;  // +Z
+                                case 5: z = -s; x = u; y = v; break; // -Z
+                            }
+                        } else {
+                            console.error(`Error: Cube geometry parameters missing or invalid for particle ${i}. Expected 'width'. ShapeGeom:`, shapeGeometry);
+                            x = 0; y = 0; z = 0;
+                        }
+                    } else if (shapeType === 'sphere' || shapeType === 'icosahedron' || shapeType === 'dodecahedron' || shapeType === 'octahedron' || shapeType === 'tetrahedron') {
+                        if (shapeGeometry.parameters && typeof shapeGeometry.parameters.radius === 'number') {
+                            const radius = shapeGeometry.parameters.radius * scaleFactor;
+                            const phi = Math.random() * 2 * Math.PI;
+                            const cosTheta = Math.random() * 2 - 1; 
+                            const theta = Math.acos(cosTheta);
+                            x = radius * Math.sin(theta) * Math.cos(phi);
+                            y = radius * Math.sin(theta) * Math.sin(phi);
+                            z = radius * Math.cos(theta);
+                        } else {
+                            console.error(`Error: ${shapeType} geometry parameters missing or invalid for particle ${i}. Expected 'radius'. ShapeGeom:`, shapeGeometry);
+                            x = 0; y = 0; z = 0;
+                        }
+                    } else if (shapeType === 'torus' || shapeType === 'torusknot') { // TorusKnot will use similar particle distribution
+                        if (shapeGeometry.parameters && typeof shapeGeometry.parameters.radius === 'number' && typeof shapeGeometry.parameters.tube === 'number') {
+                            const R = shapeGeometry.parameters.radius * scaleFactor; // Main radius
+                            const r_tube = shapeGeometry.parameters.tube * scaleFactor; // Tube radius
+                            const u_angle = Math.random() * 2 * Math.PI; // Angle around the main ring
+                            const v_angle = Math.random() * 2 * Math.PI; // Angle around the tube cross-section
+                            
+                            x = (R + r_tube * Math.cos(v_angle)) * Math.cos(u_angle);
+                            y = (R + r_tube * Math.cos(v_angle)) * Math.sin(u_angle);
+                            z = r_tube * Math.sin(v_angle);
+                        } else {
+                            console.error(`Error: ${shapeType} geometry parameters missing or invalid for particle ${i}. Expected 'radius' and 'tube'. ShapeGeom:`, shapeGeometry);
+                            x = 0; y = 0; z = 0;
+                        }
+                    } else if (shapeType === 'cylinder') {
+                        if (shapeGeometry.parameters && typeof shapeGeometry.parameters.radiusTop === 'number' && typeof shapeGeometry.parameters.height === 'number') {
+                            const radius = shapeGeometry.parameters.radiusTop * scaleFactor; // Assuming radiusTop = radiusBottom
+                            const height = shapeGeometry.parameters.height * scaleFactor;
+                            const h_half = height / 2;
+                            const areaSide = 2 * Math.PI * radius * height;
+                            const areaCap = Math.PI * radius * radius;
+                            const totalArea = areaSide + 2 * areaCap;
+                            const rand = Math.random() * totalArea;
 
-                } else if (shapeType === 'cylinder') {
-                    const radius = shapeGeometry.parameters.radiusTop * scaleFactor; // Assuming radiusTop = radiusBottom
-                    const height = shapeGeometry.parameters.height * scaleFactor;
-                    const h_half = height / 2;
+                            if (rand < areaSide) { // On the side
+                                const angle = Math.random() * 2 * Math.PI;
+                                x = radius * Math.cos(angle);
+                                y = (Math.random() - 0.5) * height;
+                                z = radius * Math.sin(angle);
+                            } else if (rand < areaSide + areaCap) { // On the top cap
+                                const r_cap = Math.sqrt(Math.random()) * radius;
+                                const angle = Math.random() * 2 * Math.PI;
+                                x = r_cap * Math.cos(angle);
+                                y = h_half;
+                                z = r_cap * Math.sin(angle);
+                            } else { // On the bottom cap
+                                const r_cap = Math.sqrt(Math.random()) * radius;
+                                const angle = Math.random() * 2 * Math.PI;
+                                x = r_cap * Math.cos(angle);
+                                y = -h_half;
+                                z = r_cap * Math.sin(angle);
+                            }
+                        } else {
+                            console.error(`Error: Cylinder geometry parameters missing or invalid for particle ${i}. Expected 'radiusTop' and 'height'. ShapeGeom:`, shapeGeometry);
+                            x = 0; y = 0; z = 0;
+                        }
+                    } else if (shapeType === 'cone') {
+                        if (shapeGeometry.parameters && typeof shapeGeometry.parameters.radius === 'number' && typeof shapeGeometry.parameters.height === 'number') {
+                            const radius = shapeGeometry.parameters.radius * scaleFactor;
+                            const height = shapeGeometry.parameters.height * scaleFactor;
+                            const h_half = height / 2; 
+                            const slantHeight = Math.sqrt(radius * radius + height * height);
+                            const areaBase = Math.PI * radius * radius;
+                            const areaSlanted = Math.PI * radius * slantHeight;
+                            const totalArea = areaBase + areaSlanted;
+                            const rand = Math.random() * totalArea;
 
-                    // Decide to place on side, top cap, or bottom cap based on approximate surface areas
-                    // Area_side = 2 * PI * r * h
-                    // Area_cap = PI * r^2
-                    const areaSide = 2 * Math.PI * radius * height;
-                    const areaCap = Math.PI * radius * radius;
-                    const totalArea = areaSide + 2 * areaCap;
-                    
-                    const rand = Math.random() * totalArea;
-
-                    if (rand < areaSide) { // On the side
-                        const angle = Math.random() * 2 * Math.PI;
-                        x = radius * Math.cos(angle);
-                        y = (Math.random() - 0.5) * height;
-                        z = radius * Math.sin(angle);
-                    } else if (rand < areaSide + areaCap) { // On the top cap
-                        const r_cap = Math.sqrt(Math.random()) * radius; // sqrt for uniform distribution over area
-                        const angle = Math.random() * 2 * Math.PI;
-                        x = r_cap * Math.cos(angle);
-                        y = h_half;
-                        z = r_cap * Math.sin(angle);
-                    } else { // On the bottom cap
-                        const r_cap = Math.sqrt(Math.random()) * radius;
-                        const angle = Math.random() * 2 * Math.PI;
-                        x = r_cap * Math.cos(angle);
-                        y = -h_half;
-                        z = r_cap * Math.sin(angle);
-                    }
-                } else if (shapeType === 'cone') {
-                    const radius = shapeGeometry.parameters.radius * scaleFactor;
-                    const height = shapeGeometry.parameters.height * scaleFactor;
-                    const h_half = height / 2; // Assuming cone tip at +h_half, base at -h_half
-
-                    // Decide to place on base or slanted surface
-                    // Area_base = PI * r^2
-                    // Area_slanted = PI * r * sqrt(r^2 + h^2) (slant height L = sqrt(r^2+h^2))
-                    const slantHeight = Math.sqrt(radius * radius + height * height);
-                    const areaBase = Math.PI * radius * radius;
-                    const areaSlanted = Math.PI * radius * slantHeight;
-                    const totalArea = areaBase + areaSlanted;
-
-                    const rand = Math.random() * totalArea;
-
-                    if (rand < areaBase) { // On the base
-                        const r_base = Math.sqrt(Math.random()) * radius;
-                        const angle = Math.random() * 2 * Math.PI;
-                        x = r_base * Math.cos(angle);
-                        y = -h_half; // Base at the bottom
-                        z = r_base * Math.sin(angle);
-                    } else { // On the slanted surface
-                        const rand_y_normalized = Math.random(); // Normalized height from base (0) to tip (1)
-                        const current_radius = radius * (1 - rand_y_normalized); // Radius decreases towards tip
-                        const angle = Math.random() * 2 * Math.PI;
-                        
-                        x = current_radius * Math.cos(angle);
-                        y = rand_y_normalized * height - h_half; // y from -h_half to +h_half
-                        z = current_radius * Math.sin(angle);
+                            if (rand < areaBase) { // On the base
+                                const r_base = Math.sqrt(Math.random()) * radius;
+                                const angle = Math.random() * 2 * Math.PI;
+                                x = r_base * Math.cos(angle);
+                                y = -h_half; 
+                                z = r_base * Math.sin(angle);
+                            } else { // On the slanted surface
+                                const rand_y_normalized = Math.random(); 
+                                const current_radius = radius * (1 - rand_y_normalized); 
+                                const angle = Math.random() * 2 * Math.PI;
+                                x = current_radius * Math.cos(angle);
+                                y = rand_y_normalized * height - h_half; 
+                                z = current_radius * Math.sin(angle);
+                            }
+                        } else {
+                            console.error(`Error: Cone geometry parameters missing or invalid for particle ${i}. Expected 'radius' and 'height'. ShapeGeom:`, shapeGeometry);
+                            x = 0; y = 0; z = 0;
+                        }
+                    } else { // Fallback for unknown shapeType
+                        console.error(`Error: Unknown shapeType "${shapeType}" encountered for particle ${i}. Defaulting particle position.`);
+                        x = 0; y = 0; z = 0;
                     }
                 }
 
+                // Universal NaN check before assignment
+                if (isNaN(x) || isNaN(y) || isNaN(z)) {
+                    console.error(`CRITICAL: NaN detected for particle ${i}. Shape: "${shapeType}", Params:`, 
+                                  shapeGeometry && shapeGeometry.parameters ? shapeGeometry.parameters : 'Params N/A', 
+                                  `Original x,y,z: ${x},${y},${z}. Defaulting position.`);
+                    x = 0; y = 0; z = 0;
+                }
 
                 particlePositions[i * 3] = x;
                 particlePositions[i * 3 + 1] = y;
@@ -380,7 +410,10 @@
             const particleMaterial = new THREE.PointsMaterial({
                 size: parseFloat(uiControls.particleSize.value),
                 vertexColors: true, // Use per-vertex colors
-                sizeAttenuation: false // Size in screen pixels
+                sizeAttenuation: false, // Size in screen pixels
+                blending: THREE.AdditiveBlending,
+                transparent: true,
+                depthWrite: false // Important for additive blending to work correctly with other objects
             });
 
             particleSystem = new THREE.Points(particlesGeometry, particleMaterial);
