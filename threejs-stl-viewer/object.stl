@@ -1,0 +1,97 @@
+solid box
+  // Face 1: Bottom (Z=0), normal pointing -Z (0 0 -1)
+  facet normal 0 0 -1
+    outer loop
+      vertex 0 0 0
+      vertex 10 20 0
+      vertex 10 0 0
+    endloop
+  endfacet
+  facet normal 0 0 -1
+    outer loop
+      vertex 0 0 0
+      vertex 0 20 0
+      vertex 10 20 0
+    endloop
+  endfacet
+
+  // Face 2: Top (Z=30), normal pointing +Z (0 0 1)
+  facet normal 0 0 1
+    outer loop
+      vertex 0 0 30
+      vertex 10 0 30
+      vertex 10 20 30
+    endloop
+  endfacet
+  facet normal 0 0 1
+    outer loop
+      vertex 0 0 30
+      vertex 10 20 30
+      vertex 0 20 30
+    endloop
+  endfacet
+
+  // Face 3: Front (Y=0), normal pointing -Y (0 -1 0)
+  facet normal 0 -1 0
+    outer loop
+      vertex 0 0 0
+      vertex 10 0 30
+      vertex 10 0 0
+    endloop
+  endfacet
+  facet normal 0 -1 0
+    outer loop
+      vertex 0 0 0
+      vertex 0 0 30
+      vertex 10 0 30
+    endloop
+  endfacet
+
+  // Face 4: Back (Y=20), normal pointing +Y (0 1 0)
+  facet normal 0 1 0
+    outer loop
+      vertex 0 20 0
+      vertex 10 20 0
+      vertex 10 20 30
+    endloop
+  endfacet
+  facet normal 0 1 0
+    outer loop
+      vertex 0 20 0
+      vertex 10 20 30
+      vertex 0 20 30
+    endloop
+  endfacet
+
+  // Face 5: Left (X=0), normal pointing -X (-1 0 0)
+  facet normal -1 0 0
+    outer loop
+      vertex 0 0 0
+      vertex 0 20 0
+      vertex 0 20 30
+    endloop
+  endfacet
+  facet normal -1 0 0
+    outer loop
+      vertex 0 0 0
+      vertex 0 20 30
+      vertex 0 0 30
+    endloop
+  endfacet
+
+  // Face 6: Right (X=10), normal pointing +X (1 0 0)
+  facet normal 1 0 0
+    outer loop
+      vertex 10 0 0
+      vertex 10 20 30
+      vertex 10 20 0
+    endloop
+  endfacet
+  facet normal 1 0 0
+    outer loop
+      vertex 10 0 0
+      vertex 10 0 30
+      vertex 10 20 30
+    endloop
+  endfacet
+endsolid box
