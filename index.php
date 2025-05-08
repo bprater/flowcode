@@ -90,7 +90,6 @@
       <p>Test your typing speed and accuracy with real-time feedback.</p>
       <a href="/typing-test/">View Project</a>
     </article>
-
     <!-- Balloon Pop -->
     <article class="card">
       <img src="https://picsum.photos/seed/balloon-pop/300/100" alt="Balloon Pop">
@@ -98,7 +97,6 @@
       <p>Pop balloons before they float away in this fun, fast-paced game.</p>
       <a href="/balloon-pop/">View Project</a>
     </article>
-
     <!-- Letter Match -->
     <article class="card">
       <img src="https://picsum.photos/seed/letter-match/300/100" alt="Letter Match">
@@ -106,7 +104,6 @@
       <p>Match letters to their correct positions before time runs out.</p>
       <a href="/letter-match/">View Project</a>
     </article>
-
     <!-- Piano -->
     <article class="card">
       <img src="https://picsum.photos/seed/piano/300/100" alt="Piano">
@@ -114,7 +111,6 @@
       <p>Play tunes on a virtual piano keyboard with responsive keys.</p>
       <a href="/piano/">View Project</a>
     </article>
-
     <!-- Particle Play -->
     <article class="card">
       <img src="https://picsum.photos/seed/particle-play/300/100" alt="Particle Play">
@@ -122,7 +118,6 @@
       <p>Experiment with interactive particle systems and physics.</p>
       <a href="/particle-play/">View Project</a>
     </article>
-
     <!-- Maze -->
     <article class="card">
       <img src="https://picsum.photos/seed/maze/300/100" alt="Maze">
@@ -130,7 +125,6 @@
       <p>Navigate through generated mazes to find the exit.</p>
       <a href="/maze/">View Project</a>
     </article>
-
     <!-- NATO Flashcards -->
     <article class="card">
       <img src="https://picsum.photos/seed/nato-flashcards/300/100" alt="NATO Flashcards">
@@ -138,7 +132,6 @@
       <p>Practice the NATO phonetic alphabet with interactive flashcards.</p>
       <a href="/nato-flashcards/">View Project</a>
     </article>
-
     <!-- Stardew Friends -->
     <article class="card">
       <img src="https://picsum.photos/seed/stardew-friends/300/100" alt="Stardew Friends">
@@ -146,7 +139,6 @@
       <p>Track and manage your friendships in Stardew Valley.</p>
       <a href="/stardew-friends/">View Project</a>
     </article>
-
     <!-- Wheezy Video Game -->
     <article class="card">
       <img src="https://picsum.photos/seed/wheezy-video-game/300/100" alt="Wheezy Video Game">
@@ -154,7 +146,6 @@
       <p>A top-down adventure game featuring Wheezy’s quests.</p>
       <a href="/wheezy-video-game/">View Project</a>
     </article>
-
     <!-- Bouncing Ball -->
     <article class="card">
       <img src="https://picsum.photos/seed/bouncing-ball/300/100" alt="Bouncing Ball">
@@ -162,7 +153,6 @@
       <p>Watch a ball bounce with realistic physics and controls.</p>
       <a href="/bouncing-ball/">View Project</a>
     </article>
-
     <!-- ToDo App -->
     <article class="card">
       <img src="https://picsum.photos/seed/todo-app/300/100" alt="ToDo App">
@@ -170,7 +160,6 @@
       <p>Manage tasks and mark them off as you complete them.</p>
       <a href="/todo-app/">View Project</a>
     </article>
-
     <!-- Vampire Studs -->
     <article class="card">
       <img src="https://picsum.photos/seed/vampire-studs/300/100" alt="Vampire Studs">
@@ -178,7 +167,6 @@
       <p>Collect and battle with vampire-themed stud cards.</p>
       <a href="/vampire-studs/">View Project</a>
     </article>
-
     <!-- Monsters Tower Defense -->
     <article class="card">
       <img src="https://picsum.photos/seed/monsters-tower-defense/300/100" alt="Monsters Tower Defense">
@@ -186,7 +174,6 @@
       <p>Defend against waves of monsters with strategic tower placement.</p>
       <a href="/monsters-tower-defense/">View Project</a>
     </article>
-
     <!-- Monster Livery -->
     <article class="card">
       <img src="https://picsum.photos/seed/monster-livery/300/100" alt="Monster Livery">
@@ -194,7 +181,6 @@
       <p>Design custom liveries for monster trucks and vehicles.</p>
       <a href="/monster-livery/">View Project</a>
     </article>
-
     <!-- Headshot -->
     <article class="card">
       <img src="https://picsum.photos/seed/headshot/300/100" alt="Headshot">
@@ -202,7 +188,6 @@
       <p>Generate AI-powered professional headshots with style presets.</p>
       <a href="/headshot/">View Project</a>
     </article>
-
     <!-- Asteroidal -->
     <article class="card">
       <img src="https://picsum.photos/seed/asteroidal/300/100" alt="Asteroidal">
@@ -210,13 +195,54 @@
       <p>Pilot your ship through an asteroid field and avoid collisions.</p>
       <a href="/asteroidal/">View Project</a>
     </article>
-
     <!-- Tower Suspense -->
     <article class="card">
       <img src="https://picsum.photos/seed/tower-suspense/300/100" alt="Tower Suspense">
       <h2>Tower Suspense</h2>
       <p>Build your tower while suspense rises as enemies approach.</p>
       <a href="/tower-suspense/">View Project</a>
+    </article>
+    <!-- ThreeJS STL Viewer -->
+    <article class="card">
+      <img src="https://picsum.photos/seed/threejs-stl-viewer/300/100" alt="ThreeJS STL Viewer">
+      <h2>ThreeJS STL Viewer</h2>
+      <p>View and interact with 3D STL models using Three.js.</p>
+      <a href="/threejs-stl-viewer/">View Project</a>
+    </article>
+    <!-- FPV Stim -->
+    <article class="card">
+      <img src="https://picsum.photos/seed/fpv-stim/300/100" alt="FPV Stim">
+      <h2>FPV Stim</h2>
+      <p>Simulate first-person drone flying with realistic camera feed.</p>
+      <a href="/fpv-stim/">View Project</a>
+    </article>
+    <!-- Particle Universe -->
+    <article class="card">
+      <img src="https://picsum.photos/seed/particle-universe/300/100" alt="Particle Universe">
+      <h2>Particle Universe</h2>
+      <p>Create cosmic particle effects exploring space phenomena.</p>
+      <a href="/particle-universe/">View Project</a>
+    </article>
+    <!-- Solar System Sim -->
+    <article class="card">
+      <img src="https://picsum.photos/seed/solar-system-sim/300/100" alt="Solar System Sim">
+      <h2>Solar System Sim</h2>
+      <p>Simulate planetary orbits and visualize the solar system.</p>
+      <a href="/solar-system-sim/">View Project</a>
+    </article>
+    <!-- Luminous Trails -->
+    <article class="card">
+      <img src="https://picsum.photos/seed/luminous-trails/300/100" alt="Luminous Trails">
+      <h2>Luminous Trails</h2>
+      <p>Draw glowing trails following moving objects.</p>
+      <a href="/luminous-trails/">View Project</a>
+    </article>
+    <!-- Island Vibe -->
+    <article class="card">
+      <img src="https://picsum.photos/seed/island-vibe/300/100" alt="Island Vibe">
+      <h2>Island Vibe</h2>
+      <p>Relax to ambient island-themed visuals and sounds.</p>
+      <a href="/island-vibe/">View Project</a>
     </article>
   </main>
 </body>
