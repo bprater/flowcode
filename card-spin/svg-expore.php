@@ -92,6 +92,10 @@
             <input type="range" id="svgOffsetY" min="-2" max="2" step="0.01" value="0">
         </div>
         <div>
+            <label for="svgOffsetZ">Offset Z (Depth): <span id="offsetZVal" class="slider-value">0.050</span></label>
+            <input type="range" id="svgOffsetZ" min="0.001" max="0.2" step="0.001" value="0.05">
+        </div>
+        <div>
             <label for="svgScale">Scale: <span id="scaleVal" class="slider-value">1.00</span></label>
             <input type="range" id="svgScale" min="0.1" max="3" step="0.01" value="1">
         </div>
@@ -113,19 +117,20 @@
         const SVG_TEXTURE_SIZE = 512;
 
         const cardColor = new THREE.Color(0x999999);
-        // --- MODIFIED COLORS ---
-        const svgFillColorString = "rgba(255, 0, 0, 0.3)"; // Semi-transparent Red for fill
-        const svgStrokeColorString = "rgba(0, 255, 0, 1)";   // Opaque Green for stroke
-        // --- You can change these color strings directly ---
+        const svgFillColorString = "rgba(255, 0, 0, 0.3)"; // Semi-transparent Red
+        const svgStrokeColorString = "rgba(0, 255, 0, 1)";   // Opaque Green
 
+        // DOM Elements
         const svgUrlInput = document.getElementById('svgUrlInput');
         const loadSvgButton = document.getElementById('loadSvgButton');
         const currentSvgUrlDiv = document.getElementById('currentSvgUrl');
         const svgOffsetXSlider = document.getElementById('svgOffsetX');
         const svgOffsetYSlider = document.getElementById('svgOffsetY');
+        const svgOffsetZSlider = document.getElementById('svgOffsetZ'); // New Z slider
         const svgScaleSlider = document.getElementById('svgScale');
         const offsetXValSpan = document.getElementById('offsetXVal');
         const offsetYValSpan = document.getElementById('offsetYVal');
+        const offsetZValSpan = document.getElementById('offsetZVal'); // New Z span
         const scaleValSpan = document.getElementById('scaleVal');
 
         const DEFAULT_SVG_URL = 'football-helmet.svg';
@@ -140,15 +145,19 @@
             renderer.setPixelRatio(window.devicePixelRatio);
             renderer.setSize(window.innerWidth, window.innerHeight);
             container.appendChild(renderer.domElement);
+
             const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
             scene.add(ambientLight);
             const directionalLight = new THREE.DirectionalLight(0xffffff, 0.9);
             directionalLight.position.set(5, 10, 7.5);
             scene.add(directionalLight);
+
             const cardGeometry = new THREE.PlaneGeometry(CARD_WIDTH, CARD_HEIGHT);
             const cardMaterial = new THREE.MeshStandardMaterial({ color: cardColor, side: THREE.DoubleSide, roughness: 0.6, metalness: 0.2 });
             cardMesh = new THREE.Mesh(cardGeometry, cardMaterial);
+            cardMesh.renderOrder = 0; 
             scene.add(cardMesh);
+
             offscreenCanvas = document.createElement('canvas');
             offscreenCanvas.width = SVG_TEXTURE_SIZE;
             offscreenCanvas.height = SVG_TEXTURE_SIZE;
@@ -157,14 +166,18 @@
                 const url = svgUrlInput.value.trim();
                 if (url) loadSVG(url); else alert("Please enter an SVG URL or file path.");
             });
-            [svgOffsetXSlider, svgOffsetYSlider, svgScaleSlider].forEach(s => s.addEventListener('input', updateSvgTransform));
+
+            // Add event listeners to all relevant sliders
+            [svgOffsetXSlider, svgOffsetYSlider, svgOffsetZSlider, svgScaleSlider].forEach(s => s.addEventListener('input', updateSvgTransform));
+            
             window.addEventListener('resize', onWindowResize, false);
             svgUrlInput.value = DEFAULT_SVG_URL;
-            loadSVG(DEFAULT_SVG_URL);
+            loadSVG(DEFAULT_SVG_URL); // This will now also use the initial Z slider value
             animate();
         }
 
         async function getRobustBBox(svgPaths) {
+            // ... (getRobustBBox function remains the same)
             let combined_d = "";
             if (svgPaths && svgPaths.forEach) {
                 svgPaths.forEach(path => {
@@ -174,7 +187,6 @@
                     }
                 });
             }
-
             if (!combined_d.trim()) {
                 let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity, hasPoints = false;
                 if (svgPaths && svgPaths.forEach) {
@@ -185,19 +197,15 @@
                                 if (pts && pts.length > 0) {
                                     hasPoints = true;
                                     pts.forEach(p => { minX=Math.min(minX,p.x); minY=Math.min(minY,p.y); maxX=Math.max(maxX,p.x); maxY=Math.max(maxY,p.y); });
-                                }
-                            };
-                            processPts(shape.extractPoints(10).shape);
-                            shape.holes.forEach(h => processPts(h.extractPoints(10).shape));
-                        });
-                    });
-                }
+                                }};
+                            processPts(shape.extractPoints(10).shape); 
+                            if (shape.holes) shape.holes.forEach(h => processPts(h.extractPoints(10).shape)); 
+                        });});}
                 if (!hasPoints) return { x:0, y:0, width:100, height:100, error:"No points in fallback BBox" };
                 const w = maxX-minX, h = maxY-minY;
                 if (w <= 0 || h <= 0) return { x:minX, y:minY, width:w||100, height:h||100, error:"Zero/neg dimension in fallback BBox"};
                 return { x:minX, y:minY, width:w, height:h };
             }
-
             const tempSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
             const tempPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
             tempPath.setAttributeNS(null, "d", combined_d);
@@ -209,78 +217,64 @@
             finally { if (tempSvg.parentNode === document.body) document.body.removeChild(tempSvg); }
             return { x:domBbox.x, y:domBbox.y, width:domBbox.width, height:domBbox.height, ...(domBbox.error && {error:domBbox.error}) };
         }
+        
+        function addPathToPath2D(path2d, threePath) {
+            // ... (addPathToPath2D function remains the same)
+            if (!threePath.curves || threePath.curves.length === 0) return false; 
+            const firstCurve = threePath.curves[0];
+            if (typeof firstCurve.getPoint !== 'function') { console.error("addPathToPath2D: no getPoint.", firstCurve); return false;}
+            const firstPt = firstCurve.getPoint(0);
+            if (!firstPt) { console.error("addPathToPath2D: getPoint(0) failed.", firstCurve); return false; }
+            path2d.moveTo(firstPt.x, firstPt.y);
+            for (const curve of threePath.curves) {
+                if (curve.isLineCurve) {
+                    if (curve.v2 && curve.v2.isVector2) path2d.lineTo(curve.v2.x, curve.v2.y);
+                    else console.warn("addPathToPath2D: Skip line.", curve);
+                } else if (curve.isQuadraticBezierCurve) {
+                    if (curve.v1 && curve.v1.isVector2 && curve.v2 && curve.v2.isVector2)
+                        path2d.quadraticCurveTo(curve.v1.x, curve.v1.y, curve.v2.x, curve.v2.y);
+                    else console.warn("addPathToPath2D: Skip quad.", curve);
+                } else if (curve.isCubicBezierCurve) {
+                    if (curve.v1 && curve.v1.isVector2 && curve.v2 && curve.v2.isVector2 && curve.v3 && curve.v3.isVector2)
+                        path2d.bezierCurveTo(curve.v1.x, curve.v1.y, curve.v2.x, curve.v2.y, curve.v3.x, curve.v3.y);
+                    else console.warn("addPathToPath2D: Skip cubic.", curve);
+                } else if (curve.isEllipseCurve) {
+                    if (typeof curve.aX === 'number' && typeof curve.aY === 'number' && typeof curve.xRadius === 'number' && typeof curve.yRadius === 'number' && typeof curve.aStartAngle === 'number' && typeof curve.aEndAngle === 'number')
+                        path2d.ellipse( curve.aX, curve.aY, curve.xRadius, curve.yRadius, curve.aRotation || 0, curve.aStartAngle, curve.aEndAngle, !(curve.aClockwise === true));
+                    else console.warn("addPathToPath2D: Skip ellipse.", curve);
+                } else console.warn("addPathToPath2D: Unhandled type:", curve.type, curve);
+            } return true; 
+        }
 
-        async function renderSvgToCanvas(svgPaths) {
-            if (!svgPaths || svgPaths.length === 0) {
-                console.warn("renderSvgToCanvas: No SVG data paths.");
-                // ... (error indication for no paths)
-                return;
-            }
-            
+        async function renderSvgToCanvas(svgDataPaths) {
+            // ... (renderSvgToCanvas function remains the same logic for drawing)
+            if (!svgDataPaths || svgDataPaths.length === 0) { console.warn("renderSvgToCanvas: No SVG data paths."); return; }
             offscreenCtx.clearRect(0,0,SVG_TEXTURE_SIZE,SVG_TEXTURE_SIZE);
-            
-            const bbox = await getRobustBBox(svgPaths);
-
-            if(typeof bbox==='undefined' || !bbox || bbox.error || typeof bbox.width!=='number'||bbox.width<=0||typeof bbox.height!=='number'||bbox.height<=0||typeof bbox.x!=='number'||typeof bbox.y!=='number'){
-                console.warn("Invalid BBox:", bbox ? JSON.parse(JSON.stringify(bbox)):bbox);
-                // ... (error indication for invalid bbox)
-                return;
-            }
+            const bbox = await getRobustBBox(svgDataPaths);
+            if(typeof bbox==='undefined' || !bbox || bbox.error || typeof bbox.width!=='number'||bbox.width<=0||typeof bbox.height!=='number'||bbox.height<=0||typeof bbox.x!=='number'||typeof bbox.y!=='number'){ console.warn("Invalid BBox:", bbox ? JSON.parse(JSON.stringify(bbox)):bbox); return; }
             const pad=0.05*SVG_TEXTURE_SIZE, tW=SVG_TEXTURE_SIZE-2*pad, tH=SVG_TEXTURE_SIZE-2*pad;
             const scale = Math.min(tW/bbox.width, tH/bbox.height);
             const tx = pad+(tW-bbox.width*scale)/2-bbox.x*scale;
             const ty = pad+(tH-bbox.height*scale)/2-bbox.y*scale;
-            
             offscreenCtx.save();
             offscreenCtx.translate(tx,ty);
             offscreenCtx.scale(scale,scale);
-
-            // Set styles for SVG paths
             offscreenCtx.fillStyle = svgFillColorString;
             offscreenCtx.strokeStyle = svgStrokeColorString;
-            offscreenCtx.lineWidth = 1.5 / scale; // Adjusted line width
-
-            for(const path of svgPaths){
-                for(const subPath of path.subPaths){
-                    if(!subPath.curves || subPath.curves.length===0 || !subPath.curves[0] || typeof subPath.curves[0].getPoint!=='function'){
-                        console.warn("Skipping problematic subPath:", subPath); continue;
-                    }
-                    
+            offscreenCtx.lineWidth = 1.5 / scale;
+            for (const shapePath of svgDataPaths) {
+                const shapes = THREE.SVGLoader.createShapes(shapePath);
+                for (const shape of shapes) {
                     const path2d = new Path2D();
-                    const firstPt = subPath.curves[0].getPoint(0);
-                    if(!firstPt){ console.error("CRIT: getPoint(0) failed for first curve!",subPath.curves[0]); continue; }
-                    path2d.moveTo(firstPt.x, firstPt.y);
-
-                    for(const curve of subPath.curves){
-                        if(curve.isLineCurve){
-                            if (curve.v2 && curve.v2.isVector2) path2d.lineTo(curve.v2.x,curve.v2.y);
-                            else console.warn("Skip line: missing v2.", curve);
-                        }
-                        else if(curve.isQuadraticBezierCurve){
-                            if (curve.v1 && curve.v1.isVector2 && curve.v2 && curve.v2.isVector2) 
-                                path2d.quadraticCurveTo(curve.v1.x, curve.v1.y, curve.v2.x, curve.v2.y);
-                            else console.warn("Skip quad curve: missing points.", curve);
-                        } else if(curve.isCubicBezierCurve){
-                            if (curve.v1 && curve.v1.isVector2 && curve.v2 && curve.v2.isVector2 && curve.v3 && curve.v3.isVector2)
-                                path2d.bezierCurveTo(curve.v1.x, curve.v1.y, curve.v2.x, curve.v2.y, curve.v3.x, curve.v3.y);
-                            else console.warn("Skip cubic curve: missing points.", curve);
-                        } else if (curve.isEllipseCurve) {
-                            if (typeof curve.aX === 'number' && typeof curve.aY === 'number' &&
-                                typeof curve.xRadius === 'number' && typeof curve.yRadius === 'number' &&
-                                typeof curve.aStartAngle === 'number' && typeof curve.aEndAngle === 'number') {
-                                path2d.ellipse(
-                                    curve.aX, curve.aY, curve.xRadius, curve.yRadius,
-                                    curve.aRotation || 0, curve.aStartAngle, curve.aEndAngle,
-                                    !(curve.aClockwise === true)
-                                );
-                            } else console.warn("Skip ellipse: missing params.", curve);
-                        }
-                        else console.warn("Unhandled curve type:", curve.type, curve);
+                    if (shape.curves && shape.curves.length > 0) {
+                        if (!addPathToPath2D(path2d, shape)) { continue; }
+                    } else { continue; }
+                    if (shape.holes && shape.holes.length > 0) {
+                        for (const holePath of shape.holes) { if (!addPathToPath2D(path2d, holePath)) {} }
                     }
-                    offscreenCtx.fill(path2d);   // Re-enable fill
+                    offscreenCtx.fill(path2d); 
                     offscreenCtx.stroke(path2d); 
-                }
-            }
+                }}
             offscreenCtx.restore();
             if(svgTexture) svgTexture.needsUpdate=true;
         }
@@ -301,32 +295,37 @@
                         const geom=new THREE.PlaneGeometry(CARD_WIDTH,CARD_HEIGHT);
                         const mat=new THREE.MeshBasicMaterial({map:svgTexture,transparent:true,alphaTest:0.05,side:THREE.DoubleSide});
                         svgPlaneMesh=new THREE.Mesh(geom,mat);
-                        svgPlaneMesh.position.z=0.011;
+                        
+                        // Use initial Z slider value for position
+                        svgPlaneMesh.position.z = parseFloat(svgOffsetZSlider.value); 
+                        svgPlaneMesh.renderOrder = 1;  
                         scene.add(svgPlaneMesh);
                         console.log("svgPlaneMesh created.");
                     }
-                    updateSvgTransform();
+                    updateSvgTransform(); // Apply all current slider values
                 },
                 (xhr)=>{ currentSvgUrlDiv.textContent=`Loading: ${url.substring(0,30)}... (${xhr.total?Math.round(xhr.loaded/xhr.total*100):0}%)`; },
                 (err)=>{ 
                     console.error(`SVGLoader error ${url}`,err); 
                     currentSvgUrlDiv.textContent = `Error loading: ${url}. Check file path & console.`;
-                    offscreenCtx.clearRect(0, 0, SVG_TEXTURE_SIZE, SVG_TEXTURE_SIZE);
-                    offscreenCtx.fillStyle = 'rgba(255,0,0,0.7)';
-                    offscreenCtx.fillRect(0,0, SVG_TEXTURE_SIZE, SVG_TEXTURE_SIZE);
-                    offscreenCtx.fillStyle = 'white';
-                    offscreenCtx.textAlign = 'center';
-                    offscreenCtx.fillText("Load Error", SVG_TEXTURE_SIZE/2, SVG_TEXTURE_SIZE/2);
-                    if(svgTexture) svgTexture.needsUpdate = true;
                 }
             );
         }
 
         function updateSvgTransform(){
             if(!svgPlaneMesh)return;
-            const ox=parseFloat(svgOffsetXSlider.value),oy=parseFloat(svgOffsetYSlider.value),sc=parseFloat(svgScaleSlider.value);
-            offsetXValSpan.textContent=ox.toFixed(2); offsetYValSpan.textContent=oy.toFixed(2); scaleValSpan.textContent=sc.toFixed(2);
-            svgPlaneMesh.position.set(ox,oy,svgPlaneMesh.position.z); svgPlaneMesh.scale.set(sc,sc,1);
+            const offsetX = parseFloat(svgOffsetXSlider.value);
+            const offsetY = parseFloat(svgOffsetYSlider.value);
+            const offsetZ = parseFloat(svgOffsetZSlider.value); // Get Z offset from slider
+            const scale = parseFloat(svgScaleSlider.value);
+
+            offsetXValSpan.textContent = offsetX.toFixed(2);
+            offsetYValSpan.textContent = offsetY.toFixed(2);
+            offsetZValSpan.textContent = offsetZ.toFixed(3); // Z offset might need more precision
+            scaleValSpan.textContent = scale.toFixed(2);
+            
+            svgPlaneMesh.position.set(offsetX, offsetY, offsetZ); // Apply X, Y, and Z
+            svgPlaneMesh.scale.set(scale, scale, 1);
         }
         function onWindowResize(){
             camera.aspect=window.innerWidth/window.innerHeight; camera.updateProjectionMatrix();
