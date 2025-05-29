@@ -38,49 +38,73 @@
             padding: 15px;
             border-radius: 10px;
             backdrop-filter: blur(10px);
-            min-width: 220px;
+            min-width: 240px;
             max-height: 90vh;
             overflow-y: auto;
         }
         
         .control-group {
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
         
         .control-group label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
             font-weight: bold;
-            font-size: 11px;
+            font-size: 10px;
         }
         
         .control-group select, .control-group button, .control-group input {
             width: 100%;
-            padding: 6px;
+            padding: 5px;
             border: none;
-            border-radius: 5px;
+            border-radius: 4px;
             background: rgba(255,255,255,0.9);
             color: #333;
             cursor: pointer;
-            font-size: 11px;
+            font-size: 10px;
             box-sizing: border-box;
         }
         
         .control-group input[type="range"] {
             cursor: pointer;
-            padding: 4px;
+            padding: 3px;
         }
         
         .control-group input[type="checkbox"] {
             width: auto;
-            margin-right: 8px;
+            margin-right: 6px;
+        }
+        
+        .control-group input[type="color"] {
+            width: 100%;
+            height: 30px;
+            padding: 2px;
+            border: 1px solid #ccc;
         }
         
         .checkbox-container {
             display: flex;
             align-items: center;
             color: white;
-            font-size: 11px;
+            font-size: 10px;
+        }
+        
+        .color-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        .color-row input[type="color"] {
+            width: 50px;
+            height: 25px;
+        }
+        
+        .color-row label {
+            font-size: 9px;
+            margin: 0;
+            min-width: 30px;
         }
         
         .control-group button {
@@ -104,10 +128,10 @@
         }
         
         .slider-value {
-            font-size: 9px;
+            font-size: 8px;
             color: #ccc;
             text-align: center;
-            margin-top: 2px;
+            margin-top: 1px;
         }
         
         #footer {
@@ -122,7 +146,33 @@
         
         .divider {
             border-top: 1px solid rgba(255,255,255,0.2);
-            margin: 10px 0;
+            margin: 8px 0;
+        }
+        
+        .heartbeat-controls {
+            display: none;
+        }
+        
+        .heartbeat-controls.active {
+            display: block;
+        }
+        
+        .sub-control {
+            margin-left: 10px;
+            font-size: 9px;
+        }
+        
+        .wave-section {
+            background: rgba(255,255,255,0.05);
+            padding: 8px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+        
+        .wave-section h4 {
+            margin: 0 0 6px 0;
+            font-size: 10px;
+            color: #ff6b6b;
         }
     </style>
 </head>
@@ -162,6 +212,95 @@
                 <option value="aurora">🌌 Aurora</option>
                 <option value="kaleidoscope">🔮 Kaleidoscope</option>
             </select>
+        </div>
+        
+        <!-- Heartbeat-specific controls -->
+        <div class="heartbeat-controls" id="heartbeatControls">
+            <div class="divider"></div>
+            
+            <div class="control-group">
+                <label>💓 Heart Rate: <span id="heartRateValue">72</span> BPM</label>
+                <input type="range" id="heartRateSlider" min="40" max="180" value="72" step="4">
+                <div class="slider-value">Slow ← → Fast</div>
+            </div>
+            
+            <div class="wave-section">
+                <h4>🌊 Wave Physics</h4>
+                
+                <div class="control-group">
+                    <label>Wave Type</label>
+                    <select id="waveTypeSelect">
+                        <option value="spherical">Spherical (3D)</option>
+                        <option value="cylindrical">Cylindrical</option>
+                        <option value="planar">Planar</option>
+                        <option value="ripple">Ripple</option>
+                    </select>
+                </div>
+                
+                <div class="control-group">
+                    <label>Wave Thickness: <span id="waveThicknessValue">0.3</span></label>
+                    <input type="range" id="waveThicknessSlider" min="0.1" max="1.0" value="0.3" step="0.05">
+                    <div class="slider-value">Thin ← → Thick</div>
+                </div>
+                
+                <div class="control-group">
+                    <label>Wave Speed: <span id="waveSpeedValue">2.0</span></label>
+                    <input type="range" id="waveSpeedSlider" min="0.5" max="5.0" value="2.0" step="0.1">
+                    <div class="slider-value">Slow ← → Fast</div>
+                </div>
+            </div>
+            
+            <div class="wave-section">
+                <h4>⏱️ Temporal Decay</h4>
+                
+                <div class="control-group">
+                    <label>Lub Decay Rate: <span id="lubDecayValue">0.8</span></label>
+                    <input type="range" id="lubDecaySlider" min="0.2" max="2.0" value="0.8" step="0.1">
+                    <div class="slider-value">Slow ← → Fast</div>
+                </div>
+                
+                <div class="control-group">
+                    <label>Dub Decay Rate: <span id="dubDecayValue">0.6</span></label>
+                    <input type="range" id="dubDecaySlider" min="0.2" max="2.0" value="0.6" step="0.1">
+                    <div class="slider-value">Slow ← → Fast</div>
+                </div>
+                
+                <div class="control-group">
+                    <label>Baseline Intensity: <span id="baselineValue">5</span>%</label>
+                    <input type="range" id="baselineSlider" min="0" max="20" value="5" step="1">
+                    <div class="slider-value">Dark ← → Bright</div>
+                </div>
+            </div>
+            
+            <div class="wave-section">
+                <h4>🎨 Colors</h4>
+                
+                <div class="control-group">
+                    <label>Peak Color (Lub)</label>
+                    <input type="color" id="peakColorPicker" value="#ff1a1a">
+                </div>
+                
+                <div class="control-group">
+                    <label>Secondary Color (Dub)</label>
+                    <input type="color" id="secondaryColorPicker" value="#cc0000">
+                </div>
+                
+                <div class="control-group">
+                    <label>Baseline Color</label>
+                    <input type="color" id="baselineColorPicker" value="#330000">
+                </div>
+                
+                <div class="control-group">
+                    <div class="checkbox-container">
+                        <input type="checkbox" id="gradientMode">
+                        <label for="gradientMode">Gradient Mode</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <button onclick="resetHeartbeatDefaults()">🔄 Reset Defaults</button>
+            </div>
         </div>
         
         <div class="divider"></div>
@@ -235,6 +374,26 @@
         let symmetryEnabled = false;
         let currentBackground = 'space';
         
+        // Heartbeat configuration
+        let heartbeatConfig = {
+            rate: 72, // BPM
+            waveType: 'spherical',
+            waveThickness: 0.3,
+            waveSpeed: 2.0,
+            lubDecayRate: 0.8,
+            dubDecayRate: 0.6,
+            baselineIntensity: 0.05,
+            peakColor: { r: 1.0, g: 0.1, b: 0.1 },
+            secondaryColor: { r: 0.8, g: 0.0, b: 0.0 },
+            baselineColor: { r: 0.2, g: 0.0, b: 0.0 },
+            gradientMode: false
+        };
+        
+        // Heartbeat variables
+        let heartbeatCenter = null;
+        let lastBeatTime = 0;
+        let heartbeatWaves = [];
+        
         // Lightning effect variables
         let lightningBolts = [];
         let nextLightningTime = 0;
@@ -250,7 +409,191 @@
         scene.add(pixelGroup);
         camera.position.z = 3;
 
-        // Create background sphere
+        // Convert hex color to RGB object
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16) / 255,
+                g: parseInt(result[2], 16) / 255,
+                b: parseInt(result[3], 16) / 255
+            } : null;
+        }
+
+        // Enhanced heartbeat wave system with configurable physics
+        function createHeartbeatWave(time) {
+            if (!heartbeatCenter) return;
+            
+            const beatDuration = 60 / heartbeatConfig.rate;
+            const timeSinceLastBeat = time - lastBeatTime;
+            
+            if (timeSinceLastBeat >= beatDuration) {
+                // Create lub wave
+                heartbeatWaves.push({
+                    startTime: time,
+                    center: heartbeatCenter.clone(),
+                    type: 'lub',
+                    intensity: 1.0,
+                    speed: heartbeatConfig.waveSpeed,
+                    maxRadius: 3.0,
+                    decayRate: heartbeatConfig.lubDecayRate,
+                    waveType: heartbeatConfig.waveType
+                });
+                
+                // Create dub wave 0.15 seconds later
+                setTimeout(() => {
+                    heartbeatWaves.push({
+                        startTime: time + 0.15,
+                        center: heartbeatCenter.clone(),
+                        type: 'dub',
+                        intensity: 0.7,
+                        speed: heartbeatConfig.waveSpeed * 0.9,
+                        maxRadius: 2.5,
+                        decayRate: heartbeatConfig.dubDecayRate,
+                        waveType: heartbeatConfig.waveType
+                    });
+                }, 150);
+                
+                lastBeatTime = time;
+            }
+            
+            // Clean up old waves
+            heartbeatWaves = heartbeatWaves.filter(wave => {
+                const waveAge = time - wave.startTime;
+                const waveRadius = waveAge * wave.speed;
+                return waveRadius < wave.maxRadius + 1.0;
+            });
+        }
+        
+        function calculateWaveDistance(pixelPos, wave) {
+            switch (wave.waveType) {
+                case 'spherical':
+                    return pixelPos.distanceTo(wave.center);
+                    
+                case 'cylindrical':
+                    const cylDist = Math.sqrt(
+                        Math.pow(pixelPos.x - wave.center.x, 2) +
+                        Math.pow(pixelPos.z - wave.center.z, 2)
+                    );
+                    return cylDist;
+                    
+                case 'planar':
+                    return Math.abs(pixelPos.y - wave.center.y);
+                    
+                case 'ripple':
+                    const rippleDist = Math.sqrt(
+                        Math.pow(pixelPos.x - wave.center.x, 2) +
+                        Math.pow(pixelPos.z - wave.center.z, 2)
+                    );
+                    return rippleDist + Math.sin(rippleDist * 5) * 0.1;
+                    
+                default:
+                    return pixelPos.distanceTo(wave.center);
+            }
+        }
+        
+        function getHeartbeatIntensity(pixelPos, time) {
+            let totalIntensity = heartbeatConfig.baselineIntensity;
+            let colorType = 'baseline';
+            
+            heartbeatWaves.forEach(wave => {
+                if (time < wave.startTime) return;
+                
+                const waveAge = time - wave.startTime;
+                const waveRadius = waveAge * wave.speed;
+                
+                if (waveRadius > wave.maxRadius) return;
+                
+                const distanceToCenter = calculateWaveDistance(pixelPos, wave);
+                const distanceToWave = Math.abs(distanceToCenter - waveRadius);
+                
+                if (distanceToWave < heartbeatConfig.waveThickness) {
+                    // Proximity to wave front
+                    const proximityFactor = 1 - (distanceToWave / heartbeatConfig.waveThickness);
+                    
+                    // Time-based decay
+                    const decayTime = waveAge / wave.decayRate;
+                    const timeFactor = Math.max(0, Math.exp(-decayTime));
+                    
+                    const waveIntensity = wave.intensity * proximityFactor * timeFactor;
+                    
+                    if (waveIntensity > totalIntensity) {
+                        totalIntensity = waveIntensity;
+                        colorType = wave.type;
+                    }
+                }
+            });
+            
+            return { intensity: Math.min(1.0, totalIntensity), type: colorType };
+        }
+
+        // Choose heartbeat center based on shape
+        function updateHeartbeatCenter() {
+            if (pixels.length === 0) return;
+            
+            switch(currentShape) {
+                case 'cube':
+                case 'diamond':
+                    heartbeatCenter = new THREE.Vector3(0, -totalShapeSize/3, 0);
+                    break;
+                case 'pyramid':
+                case 'tower':
+                    heartbeatCenter = new THREE.Vector3(0, -totalShapeSize/2, 0);
+                    break;
+                case 'sphere':
+                    heartbeatCenter = new THREE.Vector3(0, 0, 0);
+                    break;
+                case 'torus':
+                    heartbeatCenter = new THREE.Vector3(totalShapeSize/4, 0, 0);
+                    break;
+                case 'helix':
+                    heartbeatCenter = new THREE.Vector3(0, -totalShapeSize/2, 0);
+                    break;
+                default:
+                    heartbeatCenter = new THREE.Vector3(0, 0, 0);
+            }
+        }
+
+        // Reset heartbeat to defaults
+        function resetHeartbeatDefaults() {
+            heartbeatConfig = {
+                rate: 72,
+                waveType: 'spherical',
+                waveThickness: 0.3,
+                waveSpeed: 2.0,
+                lubDecayRate: 0.8,
+                dubDecayRate: 0.6,
+                baselineIntensity: 0.05,
+                peakColor: { r: 1.0, g: 0.1, b: 0.1 },
+                secondaryColor: { r: 0.8, g: 0.0, b: 0.0 },
+                baselineColor: { r: 0.2, g: 0.0, b: 0.0 },
+                gradientMode: false
+            };
+            
+            // Update UI
+            document.getElementById('heartRateSlider').value = 72;
+            document.getElementById('heartRateValue').textContent = 72;
+            document.getElementById('waveTypeSelect').value = 'spherical';
+            document.getElementById('waveThicknessSlider').value = 0.3;
+            document.getElementById('waveThicknessValue').textContent = 0.3;
+            document.getElementById('waveSpeedSlider').value = 2.0;
+            document.getElementById('waveSpeedValue').textContent = 2.0;
+            document.getElementById('lubDecaySlider').value = 0.8;
+            document.getElementById('lubDecayValue').textContent = 0.8;
+            document.getElementById('dubDecaySlider').value = 0.6;
+            document.getElementById('dubDecayValue').textContent = 0.6;
+            document.getElementById('baselineSlider').value = 5;
+            document.getElementById('baselineValue').textContent = 5;
+            document.getElementById('peakColorPicker').value = '#ff1a1a';
+            document.getElementById('secondaryColorPicker').value = '#cc0000';
+            document.getElementById('baselineColorPicker').value = '#330000';
+            document.getElementById('gradientMode').checked = false;
+            
+            // Reset waves
+            lastBeatTime = 0;
+            heartbeatWaves = [];
+        }
+
+        // Create background sphere (keeping same as before for brevity)
         function createBackground(type) {
             if (backgroundSphere) {
                 scene.remove(backgroundSphere);
@@ -259,9 +602,7 @@
             if (type === 'black') return;
             
             const sphereGeometry = new THREE.SphereGeometry(50, 32, 32);
-            const loader = new THREE.TextureLoader();
             
-            // Create procedural texture based on type
             const canvas = document.createElement('canvas');
             canvas.width = 1024;
             canvas.height = 512;
@@ -269,7 +610,6 @@
             
             switch(type) {
                 case 'space':
-                    // Starfield
                     const gradient = ctx.createLinearGradient(0, 0, 0, 512);
                     gradient.addColorStop(0, '#000011');
                     gradient.addColorStop(0.5, '#001122');
@@ -277,7 +617,6 @@
                     ctx.fillStyle = gradient;
                     ctx.fillRect(0, 0, 1024, 512);
                     
-                    // Add stars
                     ctx.fillStyle = 'white';
                     for (let i = 0; i < 1000; i++) {
                         const x = Math.random() * 1024;
@@ -288,7 +627,6 @@
                     break;
                     
                 case 'mountain':
-                    // Mountain silhouette
                     const mountainGrad = ctx.createLinearGradient(0, 0, 0, 512);
                     mountainGrad.addColorStop(0, '#87CEEB');
                     mountainGrad.addColorStop(0.7, '#FFA500');
@@ -296,7 +634,6 @@
                     ctx.fillStyle = mountainGrad;
                     ctx.fillRect(0, 0, 1024, 512);
                     
-                    // Mountains
                     ctx.fillStyle = '#2F4F4F';
                     ctx.beginPath();
                     ctx.moveTo(0, 512);
@@ -308,7 +645,6 @@
                     break;
                     
                 case 'desert':
-                    // Desert dunes
                     const desertGrad = ctx.createLinearGradient(0, 0, 0, 512);
                     desertGrad.addColorStop(0, '#FFE4B5');
                     desertGrad.addColorStop(0.5, '#DEB887');
@@ -316,7 +652,6 @@
                     ctx.fillStyle = desertGrad;
                     ctx.fillRect(0, 0, 1024, 512);
                     
-                    // Dunes
                     ctx.fillStyle = '#CD853F';
                     for (let i = 0; i < 5; i++) {
                         ctx.beginPath();
@@ -326,7 +661,6 @@
                     break;
                     
                 case 'ocean':
-                    // Ocean waves
                     const oceanGrad = ctx.createLinearGradient(0, 0, 0, 512);
                     oceanGrad.addColorStop(0, '#87CEEB');
                     oceanGrad.addColorStop(0.5, '#4682B4');
@@ -334,7 +668,6 @@
                     ctx.fillStyle = oceanGrad;
                     ctx.fillRect(0, 0, 1024, 512);
                     
-                    // Waves
                     ctx.strokeStyle = '#B0C4DE';
                     ctx.lineWidth = 2;
                     for (let y = 200; y < 512; y += 40) {
@@ -348,7 +681,6 @@
                     break;
                     
                 case 'forest':
-                    // Forest scene
                     const forestGrad = ctx.createLinearGradient(0, 0, 0, 512);
                     forestGrad.addColorStop(0, '#228B22');
                     forestGrad.addColorStop(0.7, '#006400');
@@ -356,7 +688,6 @@
                     ctx.fillStyle = forestGrad;
                     ctx.fillRect(0, 0, 1024, 512);
                     
-                    // Trees
                     ctx.fillStyle = '#8B4513';
                     for (let i = 0; i < 20; i++) {
                         const x = Math.random() * 1024;
@@ -391,7 +722,7 @@
             };
         }
 
-        // Shape generators (same as before - keeping for brevity)
+        // Shape generators (keeping same as before for brevity)
         function generateCubePixels(size) {
             const positions = [];
             for (let x = 0; x < size; x++) {
@@ -593,8 +924,8 @@
             positions.forEach((pos, index) => {
                 const pixelMaterial = new THREE.MeshBasicMaterial({
                     color: 0xffffff,
-                    transparent: true,
-                    opacity: 0.8
+                    transparent: false,
+                    opacity: 1.0
                 });
                 
                 const pixel = new THREE.Mesh(pixelGeometry, pixelMaterial);
@@ -614,10 +945,11 @@
                 pixelGroup.add(pixel);
             });
 
+            updateHeartbeatCenter();
             console.log(`Created ${currentShape} with ${pixels.length} pixels at resolution ${density}`);
         }
 
-        // Enhanced light pattern functions with new effects
+        // Enhanced light pattern functions
         const lightPatterns = {
             rainbow: (pixel, time) => {
                 const userData = pixel.userData;
@@ -625,7 +957,6 @@
                 const normalizedHue = hue / (Math.PI * 2);
                 const [r, g, b] = hslToRgb(normalizedHue, 1, 0.6);
                 pixel.material.color.setRGB(r/255, g/255, b/255);
-                pixel.material.opacity = Math.sin(time * userData.speed * 2 + userData.phase) * 0.3 + 0.7;
             },
             
             pulse: (pixel, time) => {
@@ -636,7 +967,6 @@
                 const colorIndex = Math.floor(time * 0.5) % colors.length;
                 const [r, g, b] = colors[colorIndex];
                 pixel.material.color.setRGB(r/255 * pulse, g/255 * pulse, b/255 * pulse);
-                pixel.material.opacity = pulse;
             },
             
             spiral: (pixel, time) => {
@@ -647,7 +977,6 @@
                 const hue = (time + distance * 0.1 + angle * 0.3) % (Math.PI * 2);
                 const [r, g, b] = hslToRgb(hue / (Math.PI * 2), 1, wave * 0.8);
                 pixel.material.color.setRGB(r/255, g/255, b/255);
-                pixel.material.opacity = wave;
             },
             
             wave: (pixel, time) => {
@@ -656,7 +985,6 @@
                 const hue = (userData.gridPos.y * 0.1 + time * 0.5) % (Math.PI * 2);
                 const [r, g, b] = hslToRgb(hue / (Math.PI * 2), 1, 0.7);
                 pixel.material.color.setRGB(r/255 * wave, g/255 * wave, b/255 * wave);
-                pixel.material.opacity = wave * 0.5 + 0.5;
             },
             
             strobe: (pixel, time) => {
@@ -665,7 +993,6 @@
                 const colorIndex = Math.floor(time * 2) % colors.length;
                 const [r, g, b] = colors[colorIndex];
                 pixel.material.color.setRGB(r/255 * strobe, g/255 * strobe, b/255 * strobe);
-                pixel.material.opacity = strobe * 0.8 + 0.2;
             },
             
             fire: (pixel, time) => {
@@ -676,7 +1003,6 @@
                 const g = Math.min(1, heat * flame * 0.5);
                 const b = Math.max(0, heat * flame * 0.1);
                 pixel.material.color.setRGB(r, g, b);
-                pixel.material.opacity = heat * flame;
                 userData.baseIntensity = heat * flame;
             },
             
@@ -685,7 +1011,6 @@
                 const rain = Math.sin(time * 2 + userData.gridPos.x * 2 + userData.gridPos.z * 1.5 - userData.gridPos.y * 0.5) * 0.5 + 0.5;
                 const intensity = rain > 0.7 ? 1 : rain * 0.3;
                 pixel.material.color.setRGB(0, intensity, 0);
-                pixel.material.opacity = intensity;
                 userData.baseIntensity = intensity;
             },
             
@@ -701,21 +1026,17 @@
                 const hue = (distance * 2 + time * 0.5) % (Math.PI * 2);
                 const [r, g, b] = hslToRgb(hue / (Math.PI * 2), 1, ripple * 0.8);
                 pixel.material.color.setRGB(r/255, g/255, b/255);
-                pixel.material.opacity = ripple * 0.7 + 0.3;
                 userData.baseIntensity = ripple;
             },
             
-            // NEW PATTERNS
             lightning: (pixel, time) => {
                 const userData = pixel.userData;
                 
-                // Create lightning bolts occasionally
                 if (time > nextLightningTime) {
                     nextLightningTime = time + 1 + Math.random() * 2;
                     createLightningBolt();
                 }
                 
-                // Check if pixel is part of any lightning bolt
                 let isLit = false;
                 let lightningIntensity = 0;
                 
@@ -738,42 +1059,52 @@
                 if (isLit) {
                     const flicker = Math.random() * 0.3 + 0.7;
                     pixel.material.color.setRGB(1 * flicker, 1 * flicker, 1);
-                    pixel.material.opacity = lightningIntensity * flicker;
                     userData.baseIntensity = lightningIntensity * 2;
                 } else {
-                    // Dim background
-                    const base = Math.sin(time + userData.phase) * 0.1 + 0.1;
                     pixel.material.color.setRGB(0.2, 0.2, 0.4);
-                    pixel.material.opacity = base;
-                    userData.baseIntensity = base;
+                    userData.baseIntensity = 0.1;
                 }
             },
             
+            // ADVANCED HEARTBEAT with full configurability
             heartbeat: (pixel, time) => {
                 const userData = pixel.userData;
-                const center = { x: 0, y: 0, z: 0 };
-                const distance = Math.sqrt(
-                    Math.pow(userData.originalPos.x - center.x, 2) +
-                    Math.pow(userData.originalPos.y - center.y, 2) +
-                    Math.pow(userData.originalPos.z - center.z, 2)
-                );
                 
-                // Heartbeat pattern: lub-dub, lub-dub
-                const beatTime = time * 2;
-                const beatPhase = beatTime % 3;
-                let pulse = 0;
+                createHeartbeatWave(time);
                 
-                if (beatPhase < 0.2) {
-                    pulse = Math.sin(beatPhase * Math.PI / 0.2);
-                } else if (beatPhase > 0.4 && beatPhase < 0.6) {
-                    pulse = Math.sin((beatPhase - 0.4) * Math.PI / 0.2) * 0.7;
+                const result = getHeartbeatIntensity(userData.originalPos, time);
+                const intensity = result.intensity;
+                const colorType = result.type;
+                
+                let color;
+                switch (colorType) {
+                    case 'lub':
+                        color = heartbeatConfig.peakColor;
+                        break;
+                    case 'dub':
+                        color = heartbeatConfig.secondaryColor;
+                        break;
+                    default:
+                        color = heartbeatConfig.baselineColor;
                 }
                 
-                const wave = Math.max(0, pulse - distance * 3 + 0.5);
-                const intensity = wave * (1 - distance * 0.3);
+                if (heartbeatConfig.gradientMode && colorType !== 'baseline') {
+                    // Blend between baseline and wave color
+                    const blendFactor = (intensity - heartbeatConfig.baselineIntensity) / 
+                                      (1 - heartbeatConfig.baselineIntensity);
+                    color = {
+                        r: heartbeatConfig.baselineColor.r + (color.r - heartbeatConfig.baselineColor.r) * blendFactor,
+                        g: heartbeatConfig.baselineColor.g + (color.g - heartbeatConfig.baselineColor.g) * blendFactor,
+                        b: heartbeatConfig.baselineColor.b + (color.b - heartbeatConfig.baselineColor.b) * blendFactor
+                    };
+                }
                 
-                pixel.material.color.setRGB(1, intensity * 0.3, intensity * 0.3);
-                pixel.material.opacity = Math.max(0.1, intensity);
+                pixel.material.color.setRGB(
+                    color.r * intensity,
+                    color.g * intensity,
+                    color.b * intensity
+                );
+                
                 userData.baseIntensity = intensity;
             },
             
@@ -795,7 +1126,6 @@
                 
                 const intensity = (flow1 + flow2 + flow3) / 3;
                 pixel.material.color.setRGB(r/255 * intensity, g/255 * intensity, b/255 * intensity);
-                pixel.material.opacity = intensity * 0.8 + 0.2;
                 userData.baseIntensity = intensity;
             },
             
@@ -804,11 +1134,9 @@
                 let pos = userData.originalPos.clone();
                 
                 if (symmetryEnabled) {
-                    // Create kaleidoscope symmetry
                     pos.x = Math.abs(pos.x);
                     pos.z = Math.abs(pos.z);
                     
-                    // Mirror diagonal
                     if (pos.x > pos.z) {
                         const temp = pos.x;
                         pos.x = pos.z;
@@ -825,7 +1153,6 @@
                 const [r, g, b] = hslToRgb(hue, 1, pattern * 0.8);
                 
                 pixel.material.color.setRGB(r/255, g/255, b/255);
-                pixel.material.opacity = (pattern + pattern2) / 2 * 0.8 + 0.2;
                 userData.baseIntensity = (pattern + pattern2) / 2;
             }
         };
@@ -850,7 +1177,6 @@
                 const t = i / segments;
                 const point = start.clone().lerp(end, t);
                 
-                // Add jaggedness
                 if (i > 0 && i < segments) {
                     point.add(new THREE.Vector3(
                         (Math.random() - 0.5) * 0.3,
@@ -867,7 +1193,6 @@
                 endTime: Date.now() / 1000 + 0.5
             });
             
-            // Clean up old bolts
             lightningBolts = lightningBolts.filter(bolt => bolt.endTime > Date.now() / 1000);
         }
 
@@ -877,11 +1202,20 @@
             
             const intensity = pixel.userData.baseIntensity || 1;
             if (intensity > 0.7) {
-                // Scale up bright pixels
                 const scale = 1 + (intensity - 0.7) * 0.5;
                 pixel.scale.setScalar(scale);
             } else {
                 pixel.scale.setScalar(1);
+            }
+        }
+
+        // Show/hide heartbeat controls
+        function toggleHeartbeatControls() {
+            const controls = document.getElementById('heartbeatControls');
+            if (currentPattern === 'heartbeat') {
+                controls.classList.add('active');
+            } else {
+                controls.classList.remove('active');
             }
         }
 
@@ -913,6 +1247,7 @@
             const randomPattern = patterns[Math.floor(Math.random() * patterns.length)];
             document.getElementById('patternSelect').value = randomPattern;
             currentPattern = randomPattern;
+            toggleHeartbeatControls();
         }
 
         // Mouse controls (same as before)
@@ -940,6 +1275,60 @@
 
         document.getElementById('patternSelect').addEventListener('change', (e) => {
             currentPattern = e.target.value;
+            toggleHeartbeatControls();
+        });
+
+        // Heartbeat control event listeners
+        document.getElementById('heartRateSlider').addEventListener('input', (e) => {
+            heartbeatConfig.rate = parseInt(e.target.value);
+            document.getElementById('heartRateValue').textContent = heartbeatConfig.rate;
+            lastBeatTime = 0;
+            heartbeatWaves = [];
+        });
+
+        document.getElementById('waveTypeSelect').addEventListener('change', (e) => {
+            heartbeatConfig.waveType = e.target.value;
+        });
+
+        document.getElementById('waveThicknessSlider').addEventListener('input', (e) => {
+            heartbeatConfig.waveThickness = parseFloat(e.target.value);
+            document.getElementById('waveThicknessValue').textContent = heartbeatConfig.waveThickness;
+        });
+
+        document.getElementById('waveSpeedSlider').addEventListener('input', (e) => {
+            heartbeatConfig.waveSpeed = parseFloat(e.target.value);
+            document.getElementById('waveSpeedValue').textContent = heartbeatConfig.waveSpeed;
+        });
+
+        document.getElementById('lubDecaySlider').addEventListener('input', (e) => {
+            heartbeatConfig.lubDecayRate = parseFloat(e.target.value);
+            document.getElementById('lubDecayValue').textContent = heartbeatConfig.lubDecayRate;
+        });
+
+        document.getElementById('dubDecaySlider').addEventListener('input', (e) => {
+            heartbeatConfig.dubDecayRate = parseFloat(e.target.value);
+            document.getElementById('dubDecayValue').textContent = heartbeatConfig.dubDecayRate;
+        });
+
+        document.getElementById('baselineSlider').addEventListener('input', (e) => {
+            heartbeatConfig.baselineIntensity = parseInt(e.target.value) / 100;
+            document.getElementById('baselineValue').textContent = parseInt(e.target.value);
+        });
+
+        document.getElementById('peakColorPicker').addEventListener('change', (e) => {
+            heartbeatConfig.peakColor = hexToRgb(e.target.value);
+        });
+
+        document.getElementById('secondaryColorPicker').addEventListener('change', (e) => {
+            heartbeatConfig.secondaryColor = hexToRgb(e.target.value);
+        });
+
+        document.getElementById('baselineColorPicker').addEventListener('change', (e) => {
+            heartbeatConfig.baselineColor = hexToRgb(e.target.value);
+        });
+
+        document.getElementById('gradientMode').addEventListener('change', (e) => {
+            heartbeatConfig.gradientMode = e.target.checked;
         });
 
         document.getElementById('backgroundSelect').addEventListener('change', (e) => {
@@ -1030,26 +1419,20 @@
             if (!isPaused) {
                 time += 0.01;
                 
-                // Smooth rotation
                 currentRotationX += (targetRotationX - currentRotationX) * 0.05;
                 currentRotationY += (targetRotationY - currentRotationY) * 0.05;
                 pixelGroup.rotation.x = currentRotationX;
                 pixelGroup.rotation.y = currentRotationY;
 
-                // Auto-rotation when not controlled
                 if (!mouseDown) {
                     targetRotationY += 0.003;
                 }
 
-                // Apply current light pattern
                 if (lightPatterns[currentPattern]) {
                     pixels.forEach(pixel => {
                         lightPatterns[currentPattern](pixel, time);
-                        
-                        // Apply glow effect
                         applyGlowEffect(pixel);
                         
-                        // Add subtle position animation
                         const wobble = Math.sin(time * pixel.userData.speed + pixel.userData.phase) * 0.01;
                         pixel.position.copy(pixel.userData.originalPos);
                         pixel.position.multiplyScalar(1 + wobble);
