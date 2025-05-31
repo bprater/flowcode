@@ -24,12 +24,6 @@
     <canvas id="spaceCanvas"></canvas>
     <div id="controlsPanel">
         <h2>Controls</h2>
-        <div class="control-group">
-            <label for="perspectiveFocalLength">Perspective Focal Length:</label>
-            <input type="range" id="perspectiveFocalLength" min="50" max="1000" value="300" step="10">
-            <span id="perspectiveFocalLengthValue">300</span>
-        </div>
-        <hr>
         <!-- Star Controls -->
         <div class="control-group"><label for="starDensity">Star Density:</label><input type="range" id="starDensity" min="50" max="1000" value="200" step="10"><span id="starDensityValue">200</span></div>
         <div class="control-group"><label for="minStarSize">Min Star Size:</label><input type="range" id="minStarSize" min="0.1" max="2" value="0.5" step="0.1"><span id="minStarSizeValue">0.5</span></div>
@@ -43,10 +37,10 @@
         <div class="control-group"><label for="starColorSaturation">Star Sat (%):</label><input type="range" id="starColorSaturation" min="0" max="100" value="80" step="1"><span id="starColorSaturationValue">80</span></div>
         <div class="control-group"><label for="starColorLightness">Star Light (%):</label><input type="range" id="starColorLightness" min="50" max="100" value="70" step="1"><span id="starColorLightnessValue">70</span></div>
         <hr>
-        <!-- Asteroid Controls -->
-        <div class="control-group"><label for="asteroidDensity">Asteroid Density:</label><input type="range" id="asteroidDensity" min="0" max="200" value="20" step="5"><span id="asteroidDensityValue">20</span></div>
-        <div class="control-group"><label for="minAsteroidSize">Min Asteroid Radius:</label><input type="range" id="minAsteroidSize" min="2" max="50" value="5" step="1"><span id="minAsteroidSizeValue">5</span></div>
-        <div class="control-group"><label for="maxAsteroidSize">Max Asteroid Radius:</label><input type="range" id="maxAsteroidSize" min="5" max="150" value="40" step="1"><span id="maxAsteroidSizeValue">40</span></div>
+        <!-- Asteroid Controls (2D) -->
+        <div class="control-group"><label for="asteroidDensity">Asteroid Density:</label><input type="range" id="asteroidDensity" min="0" max="200" value="30" step="5"><span id="asteroidDensityValue">30</span></div>
+        <div class="control-group"><label for="minAsteroidSize">Min Asteroid Size:</label><input type="range" id="minAsteroidSize" min="5" max="50" value="10" step="1"><span id="minAsteroidSizeValue">10</span></div>
+        <div class="control-group"><label for="maxAsteroidSize">Max Asteroid Size:</label><input type="range" id="maxAsteroidSize" min="10" max="150" value="40" step="1"><span id="maxAsteroidSizeValue">40</span></div>
         <div class="control-group"><label for="minAsteroidSpeed">Min Asteroid Speed:</label><input type="range" id="minAsteroidSpeed" min="0.1" max="1.5" value="0.3" step="0.1"><span id="minAsteroidSpeedValue">0.3</span></div>
         <div class="control-group"><label for="maxAsteroidSpeed">Max Asteroid Speed:</label><input type="range" id="maxAsteroidSpeed" min="0.3" max="3" value="0.8" step="0.1"><span id="maxAsteroidSpeedValue">0.8</span></div>
         <hr>
@@ -74,10 +68,7 @@
             let stars = [], comets = [], nebulas = [], asteroids = [];
             let isDragging = false, lastMouseY = 0, verticalOffset = 0;
 
-            const MAX_ASTEROID_Z_DISTANCE = 800; 
-
             const controls = { 
-                perspectiveFocalLength: document.getElementById('perspectiveFocalLength'),
                 starDensity: document.getElementById('starDensity'), minStarSize: document.getElementById('minStarSize'), maxStarSize: document.getElementById('maxStarSize'), minStarSpeed: document.getElementById('minStarSpeed'), maxStarSpeed: document.getElementById('maxStarSpeed'), starBlinkChance: document.getElementById('starBlinkChance'), starBlinkSpeed: document.getElementById('starBlinkSpeed'), starColorHueMin: document.getElementById('starColorHueMin'), starColorHueMax: document.getElementById('starColorHueMax'), starColorSaturation: document.getElementById('starColorSaturation'), starColorLightness: document.getElementById('starColorLightness'), 
                 asteroidDensity: document.getElementById('asteroidDensity'), minAsteroidSize: document.getElementById('minAsteroidSize'), maxAsteroidSize: document.getElementById('maxAsteroidSize'), minAsteroidSpeed: document.getElementById('minAsteroidSpeed'), maxAsteroidSpeed: document.getElementById('maxAsteroidSpeed'),
                 cometChance: document.getElementById('cometChance'), cometSpeed: document.getElementById('cometSpeed'),
@@ -87,7 +78,6 @@
             };
 
             const controlValues = { 
-                perspectiveFocalLength: () => parseFloat(controls.perspectiveFocalLength.value),
                 starDensity:()=>parseInt(controls.starDensity.value),minStarSize:()=>parseFloat(controls.minStarSize.value),maxStarSize:()=>parseFloat(controls.maxStarSize.value),minStarSpeed:()=>parseFloat(controls.minStarSpeed.value),maxStarSpeed:()=>parseFloat(controls.maxStarSpeed.value),starBlinkChance:()=>parseInt(controls.starBlinkChance.value)/100,starBlinkSpeed:()=>parseFloat(controls.starBlinkSpeed.value),starColorHueMin:()=>parseInt(controls.starColorHueMin.value),starColorHueMax:()=>parseInt(controls.starColorHueMax.value),starColorSaturation:()=>parseInt(controls.starColorSaturation.value),starColorLightness:()=>parseInt(controls.starColorLightness.value),
                 asteroidDensity:()=>parseInt(controls.asteroidDensity.value),minAsteroidSize:()=>parseFloat(controls.minAsteroidSize.value),maxAsteroidSize:()=>parseFloat(controls.maxAsteroidSize.value),minAsteroidSpeed:()=>parseFloat(controls.minAsteroidSpeed.value),maxAsteroidSpeed:()=>parseFloat(controls.maxAsteroidSpeed.value),
                 cometChance:()=>parseFloat(controls.cometChance.value)/100,cometSpeed:()=>parseFloat(controls.cometSpeed.value),
@@ -98,85 +88,94 @@
             function random(min, max) { return Math.random() * (max - min) + min; }
             function setCanvasSize() { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight;}
 
-            function rotateX(p,a){const c=Math.cos(a),s=Math.sin(a);return{x:p.x,y:p.y*c-p.z*s,z:p.y*s+p.z*c};}
-            function rotateY(p,a){const c=Math.cos(a),s=Math.sin(a);return{x:p.z*s+p.x*c,y:p.y,z:p.z*c-p.x*s};}
-            function rotateZ(p,a){const c=Math.cos(a),s=Math.sin(a);return{x:p.x*c-p.y*s,y:p.x*s+p.y*c,z:p.z};}
-
             function createStar(x,y,s,sp,c,iB,bP){return{x,y,size:s,speed:sp,color:c,isBlinking:iB,blinkPhase:bP,baseAlpha:1};}
             function initStars(){stars=[];const d=controlValues.starDensity();for(let i=0;i<d;i++){const dep=random(0.1,1);const sp=controlValues.minStarSpeed()+(controlValues.maxStarSpeed()-controlValues.minStarSpeed())*dep;const s=controlValues.minStarSize()+(controlValues.maxStarSize()-controlValues.minStarSize())*dep;const h=random(controlValues.starColorHueMin(),controlValues.starColorHueMax());const sat=controlValues.starColorSaturation();const l=controlValues.starColorLightness();const clr=`hsla(${h},${sat}%,${l}%,1)`;const iB=Math.random()<controlValues.starBlinkChance();const bP=random(0,Math.PI*2);stars.push(createStar(random(0,width),random(0,height),s,sp,clr,iB,bP));}}
             function updateStar(s){s.x-=s.speed;if(s.x<-s.size){s.x=width+s.size;s.y=random(0,height);const dep=random(0.1,1);s.speed=controlValues.minStarSpeed()+(controlValues.maxStarSpeed()-controlValues.minStarSpeed())*dep;s.size=controlValues.minStarSize()+(controlValues.maxStarSize()-controlValues.minStarSize())*dep;const h=random(controlValues.starColorHueMin(),controlValues.starColorHueMax());s.color=`hsla(${h},${controlValues.starColorSaturation()}%,${controlValues.starColorLightness()}%,1)`;s.isBlinking=Math.random()<controlValues.starBlinkChance();s.blinkPhase=random(0,Math.PI*2);}if(s.isBlinking){s.blinkPhase+=controlValues.starBlinkSpeed();s.baseAlpha=0.75+Math.sin(s.blinkPhase)*0.25;}else{s.baseAlpha=1;}}
             function drawStar(s){const cP=s.color.match(/hsla\((\d+),\s*([\d.]+)%,\s*([\d.]+)%,\s*([\d.]+)\)/);ctx.fillStyle=cP?`hsla(${cP[1]},${cP[2]}%,${cP[3]}%,${s.baseAlpha})`:s.color;ctx.beginPath();ctx.arc(s.x,s.y,s.size/2,0,Math.PI*2);ctx.fill();}
 
-            function createAsteroidModelVertices(modelRadius) {
+            // --- Asteroid Logic (2D) ---
+            function create2DAsteroidShape(avgSize) {
                 const vertices = [];
-                const numVertices = Math.floor(random(10, 20)); 
-                const mainPerturbationFactorRange = 0.4; // Max deviation from sphere (e.g., 0.4 means can be 60% to 140% of radius)
-                const surfaceJitterFactor = modelRadius * 0.15; 
+                const numVertices = Math.floor(random(6, 12)); // Number of points for the polygon
+                const angleStep = (Math.PI * 2) / numVertices;
 
                 for (let i = 0; i < numVertices; i++) {
-                    let u = Math.random(); 
-                    let v = Math.random(); 
-                    let theta = 2 * Math.PI * u;
-                    let phi = Math.acos(2 * v - 1);
-                    
-                    let currentRadius = modelRadius * random(1.0 - mainPerturbationFactorRange, 1.0 + mainPerturbationFactorRange);
-
-                    let x = currentRadius * Math.sin(phi) * Math.cos(theta);
-                    let y = currentRadius * Math.sin(phi) * Math.sin(theta);
-                    let z = currentRadius * Math.cos(phi);
-                    
-                    x += random(-surfaceJitterFactor, surfaceJitterFactor);
-                    y += random(-surfaceJitterFactor, surfaceJitterFactor);
-                    z += random(-surfaceJitterFactor, surfaceJitterFactor);
-
-                    vertices.push({ x, y, z });
+                    const currentAngle = i * angleStep;
+                    // Perturb the radius for each vertex to make it irregular
+                    const radius = avgSize * random(0.6, 1.4); 
+                    vertices.push({
+                        x: Math.cos(currentAngle) * radius,
+                        y: Math.sin(currentAngle) * radius
+                    });
                 }
                 return vertices;
             }
-            function initAsteroids(){
-                asteroids=[];
-                const density=controlValues.asteroidDensity();
-                for(let i=0;i<density;i++){
-                    const depthFactor=random(0.1,1); 
-                    const modelRadius = controlValues.minAsteroidSize() + (controlValues.maxAsteroidSize() - controlValues.minAsteroidSize()) * (1 - depthFactor);
+
+            function initAsteroids() {
+                asteroids = [];
+                const density = controlValues.asteroidDensity();
+                for (let i = 0; i < density; i++) {
+                    // Depth factor: 0.1 (close, large, fast) to 1.0 (far, small, slow)
+                    const depthFactor = random(0.1, 1); 
+                    
+                    const size = controlValues.minAsteroidSize() + (controlValues.maxAsteroidSize() - controlValues.minAsteroidSize()) * (1 - depthFactor);
                     const speed = controlValues.minAsteroidSpeed() + (controlValues.maxAsteroidSpeed() - controlValues.minAsteroidSpeed()) * (1 - depthFactor);
                     
-                    const lightness=random(25,55);
-                    const color=`hsl(25,${random(5,15)}%,${lightness}%)`;
-                    asteroids.push({
-                        x:random(0,width), y:random(0,height), 
-                        zPos:depthFactor*MAX_ASTEROID_Z_DISTANCE, 
-                        speed:speed,
-                        modelVertices:createAsteroidModelVertices(modelRadius),
-                        rX:random(0,Math.PI*2),rY:random(0,Math.PI*2),rZ:random(0,Math.PI*2),
-                        rsX:random(-0.01,0.01),rsY:random(-0.01,0.01),rsZ:random(-0.01,0.01),
-                        color:color,
-                        depthFactor:depthFactor 
-                    });
+                    const x = random(0, width);
+                    const y = random(0, height);
+                    const angle = random(0, Math.PI * 2); // Initial 2D rotation angle
+                    const rotationSpeed = random(-0.03, 0.03); // Radians per frame for 2D spin
+                    
+                    const vertices = create2DAsteroidShape(size / 2); // Pass average radius
+                    
+                    const lightness = random(25, 60); // Shades of grey/brown
+                    const color = `hsl(30, ${random(10,30)}%, ${lightness}%)`;
+
+                    asteroids.push({ x, y, size, speed, angle, rotationSpeed, vertices, color, depthFactor });
                 }
             }
-            function updateAsteroid(a){
-                a.x-=a.speed;a.rX+=a.rsX;a.rY+=a.rsY;a.rZ+=a.rsZ;
-                let mPR=0;const fL=controlValues.perspectiveFocalLength();
-                a.modelVertices.forEach(v=>{let tV={...v};tV=rotateX(tV,a.rX);tV=rotateY(tV,a.rY);tV=rotateZ(tV,a.rZ);const wZ=a.zPos+tV.z;if(fL+wZ>0.001){const sc=fL/(fL+wZ);mPR=Math.max(mPR,Math.sqrt(tV.x*tV.x+tV.y*tV.y)*sc);}else{mPR=Math.max(mPR,100);}});
-                if(a.x<-mPR*1.5){
-                    a.x=width+mPR*1.5;a.y=random(0,height);
-                    const depthFactor=random(0.1,1);
-                    const modelRadius = controlValues.minAsteroidSize() + (controlValues.maxAsteroidSize() - controlValues.minAsteroidSize()) * (1 - depthFactor);
-                    a.speed = controlValues.minAsteroidSpeed() + (controlValues.maxAsteroidSpeed() - controlValues.minAsteroidSpeed()) * (1 - depthFactor);
-                    a.zPos=depthFactor*MAX_ASTEROID_Z_DISTANCE;
-                    a.modelVertices=createAsteroidModelVertices(modelRadius);
-                    const l=random(25,55);a.color=`hsl(25,${random(5,15)}%,${l}%)`;
-                    a.df=depthFactor;a.rsX=random(-0.01,0.01);a.rsY=random(-0.01,0.01);a.rsZ=random(-0.01,0.01);
+
+            function updateAsteroid(asteroid) {
+                asteroid.x -= asteroid.speed;
+                asteroid.angle += asteroid.rotationSpeed;
+
+                if (asteroid.x < -asteroid.size) { // Reset asteroid
+                    asteroid.x = width + asteroid.size;
+                    asteroid.y = random(0, height);
+                    
+                    const depthFactor = random(0.1, 1);
+                    asteroid.size = controlValues.minAsteroidSize() + (controlValues.maxAsteroidSize() - controlValues.minAsteroidSize()) * (1 - depthFactor);
+                    asteroid.speed = controlValues.minAsteroidSpeed() + (controlValues.maxAsteroidSpeed() - controlValues.minAsteroidSpeed()) * (1 - depthFactor);
+                    asteroid.vertices = create2DAsteroidShape(asteroid.size / 2);
+                    const lightness = random(25, 60);
+                    asteroid.color = `hsl(30, ${random(10,30)}%, ${lightness}%)`;
+                    asteroid.rotationSpeed = random(-0.03, 0.03);
+                    asteroid.depthFactor = depthFactor;
                 }
             }
-            function drawAsteroid(a){const fL=controlValues.perspectiveFocalLength();const sP=[];for(let i=0;i<a.modelVertices.length;i++){let v=a.modelVertices[i];v=rotateX(v,a.rX);v=rotateY(v,a.rY);v=rotateZ(v,a.rZ);const wZ=a.zPos+v.z;if(fL+wZ<=0.001){sP.push({x:a.x+v.x*0.0001,y:a.y+v.y*0.0001,z:wZ});continue;}const sc=fL/(fL+wZ);if(sc<0){sP.push({x:a.x+v.x*0.0001,y:a.y+v.y*0.0001,z:wZ});continue;}sP.push({x:a.x+v.x*sc,y:a.y+v.y*sc,z:wZ});}if(sP.length<3)return;ctx.fillStyle=a.color;ctx.beginPath();ctx.moveTo(sP[0].x,sP[0].y);for(let i=1;i<sP.length;i++)ctx.lineTo(sP[i].x,sP[i].y);ctx.closePath();ctx.fill();}
+
+            function drawAsteroid(asteroid) {
+                ctx.save();
+                ctx.translate(asteroid.x, asteroid.y);
+                ctx.rotate(asteroid.angle);
+                ctx.fillStyle = asteroid.color;
+                ctx.beginPath();
+                if (asteroid.vertices.length > 0) {
+                    ctx.moveTo(asteroid.vertices[0].x, asteroid.vertices[0].y);
+                    for (let i = 1; i < asteroid.vertices.length; i++) {
+                        ctx.lineTo(asteroid.vertices[i].x, asteroid.vertices[i].y);
+                    }
+                }
+                ctx.closePath();
+                ctx.fill();
+                ctx.restore();
+            }
 
             function createComet(){let x,y,a;const s=controlValues.cometSpeed();x=width+random(50,300);y=random(0,height);a=Math.PI+random(-0.1,0.1);const h=random(180,240);const clr=`hsla(${h},90%,70%,1)`;return{x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,color:clr,tail:[]};}
             function updateComet(c){c.tail.unshift({x:c.x,y:c.y});if(c.tail.length>20+Math.abs(c.vx)*2)c.tail.pop();c.x+=c.vx;c.y+=c.vy;}
             function drawComet(c){ctx.fillStyle=c.color;ctx.beginPath();ctx.arc(c.x,c.y,3,0,Math.PI*2);ctx.fill();c.tail.forEach((seg,idx)=>{const alpha=1-(idx/c.tail.length);const s=Math.max(0.1,(3-(idx/c.tail.length)*3));const cP=c.color.match(/hsla\((\d+),\s*([\d.]+)%,\s*([\d.]+)%,\s*([\d.]+)\)/);if(cP)ctx.fillStyle=`hsla(${cP[1]},${cP[2]}%,${cP[3]}%,${alpha*0.8})`;ctx.beginPath();ctx.arc(seg.x,seg.y,s,0,Math.PI*2);ctx.fill();});}
 
-            function createNebula() {
+            function createNebula() { /* ... (Nebula code remains the same) ... */
                 const x = random(-width * 0.2, width * 1.2); const y = random(0, height);
                 const radius = random(width * 0.1, width * 0.4); const hue = random(200, 300); 
                 const saturation = random(60, 100); const lightness = random(20, 40); 
@@ -213,8 +212,10 @@
                 ctx.clearRect(0, 0, width, height);
                 ctx.save(); ctx.translate(0, verticalOffset);
                 nebulas.forEach(n => { updateNebula(n); drawNebula(n); });
-                asteroids.sort((a, b) => b.zPos - a.zPos); 
+                
+                // No Z-sorting needed for 2D asteroids with this draw order
                 asteroids.forEach(a => { updateAsteroid(a); drawAsteroid(a); });
+
                 stars.forEach(s => { updateStar(s); drawStar(s); });
                 if (Math.random() < controlValues.cometChance()) if (comets.length < 20) comets.push(createComet());
                 comets = comets.filter(c=>c.x>-100-c.tail.length*5&&c.x<width+100+c.tail.length*5&&c.y>-100&&c.y<height+100);
@@ -229,7 +230,7 @@
             document.addEventListener('mouseleave',()=>{if(isDragging){isDragging=false;canvas.style.cursor='grab';}});
 
             function setupEventListeners() {
-                Object.keys(controls).forEach(k=>{if(k==='resetButton'||k==='randomizeAllButton')return;const iE=controls[k];const vE=document.getElementById(`${k}Value`);if(iE&&vE){iE.addEventListener('input',()=>{vE.textContent=iE.value;const p=[['minStarSize','maxStarSize'],['minStarSpeed','maxStarSpeed'],['starColorHueMin','starColorHueMax'],['minAsteroidSize','maxAsteroidSize'],['minAsteroidSpeed','maxAsteroidSpeed']];p.forEach(pK=>{if(k===pK[0]&&parseFloat(iE.value)>parseFloat(controls[pK[1]].value)){controls[pK[1]].value=iE.value;document.getElementById(`${pK[1]}Value`).textContent=iE.value;}if(k===pK[1]&&parseFloat(iE.value)<parseFloat(controls[pK[0]].value)){controls[pK[0]].value=iE.value;document.getElementById(`${pK[0]}Value`).textContent=iE.value;}});if(k==='nebulaCount'||k==='nebulaOpacity'||k.includes('nebulaPulse'))initNebulas();if(k==='asteroidDensity'||k.includes('AsteroidSize')||k==='perspectiveFocalLength')initAsteroids();});if(vE)vE.textContent=iE.value;}});
+                Object.keys(controls).forEach(k=>{if(k==='resetButton'||k==='randomizeAllButton')return;const iE=controls[k];const vE=document.getElementById(`${k}Value`);if(iE&&vE){iE.addEventListener('input',()=>{vE.textContent=iE.value;const p=[['minStarSize','maxStarSize'],['minStarSpeed','maxStarSpeed'],['starColorHueMin','starColorHueMax'],['minAsteroidSize','maxAsteroidSize'],['minAsteroidSpeed','maxAsteroidSpeed']];p.forEach(pK=>{if(k===pK[0]&&parseFloat(iE.value)>parseFloat(controls[pK[1]].value)){controls[pK[1]].value=iE.value;document.getElementById(`${pK[1]}Value`).textContent=iE.value;}if(k===pK[1]&&parseFloat(iE.value)<parseFloat(controls[pK[0]].value)){controls[pK[0]].value=iE.value;document.getElementById(`${pK[0]}Value`).textContent=iE.value;}});if(k==='nebulaCount'||k==='nebulaOpacity'||k.includes('nebulaPulse'))initNebulas();if(k==='asteroidDensity'||k.includes('AsteroidSize'))initAsteroids();});if(vE)vE.textContent=iE.value;}});
                 controls.resetButton.addEventListener('click',()=>{initStars();initNebulas();initAsteroids();comets=[];verticalOffset=0;});
                 controls.randomizeAllButton.addEventListener('click',()=>{const sK=Object.keys(controls).filter(k=>k!=='resetButton'&&k!=='randomizeAllButton');sK.forEach(k=>{const s=controls[k];const vS=document.getElementById(`${k}Value`);const min=parseFloat(s.min);const max=parseFloat(s.max);const step=parseFloat(s.step);let rV;if(step===1||(Number.isInteger(step)&&step!==0)){const nSIR=Math.floor((max-min)/step);rV=min+(Math.floor(Math.random()*(nSIR+1))*step);}else{const dP=String(step).includes('.')?String(step).split('.')[1].length:0;const scale=Math.pow(10,dP);const mS=Math.round(min*scale);const mxS=Math.round(max*scale);const sS=Math.round(step*scale);const nSIR=Math.floor((mxS-mS)/sS);const rSC=Math.floor(Math.random()*(nSIR+1));rV=(mS+(rSC*sS))/scale;rV=parseFloat(rV.toFixed(dP));}s.value=rV;if(vS)vS.textContent=s.value;});const p=[['minStarSize','maxStarSize'],['minStarSpeed','maxStarSpeed'],['starColorHueMin','starColorHueMax'],['minAsteroidSize','maxAsteroidSize'],['minAsteroidSpeed','maxAsteroidSpeed']];p.forEach(pK=>{const mS=controls[pK[0]];const mxS=controls[pK[1]];const mVS=document.getElementById(`${pK[0]}Value`);const mxVS=document.getElementById(`${pK[1]}Value`);if(parseFloat(mS.value)>parseFloat(mxS.value)){const t=mS.value;mS.value=mxS.value;mxS.value=t;if(mVS)mVS.textContent=mS.value;if(mxVS)mxVS.textContent=mxS.value;}});initStars();initNebulas();initAsteroids();comets=[];verticalOffset=0;});
                 window.addEventListener('resize',()=>{setCanvasSize();initStars();initNebulas();initAsteroids();});
