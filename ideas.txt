@@ -1,0 +1,51 @@
+# Tower Defense Mob Ideas
+
+## 🦇 Flying Mobs
+- **Bat Swarm**: Small, fast flying enemies that bypass ground-based obstacles and take alternative air routes
+- **Flying Eyeball**: Winged eyeball that hovers above the path, harder to hit but more vulnerable to lightning towers
+- **Drone Scout**: Mechanical flying unit that moves erratically and has shield regeneration
+
+## 🛡️ Armored/Special Defense Mobs
+- **Armored Cyclops**: Single large eye with metallic armor plating - takes reduced damage from certain tower types
+- **Mirror Eye**: Reflective eyeball that has a chance to reflect projectiles back at towers
+- **Phase Walker**: Ghostly eyeball that can briefly become translucent and pass through towers
+
+## 👥 Group/Spawning Mobs
+- **Mother Eye**: Large eyeball that splits into 2-3 smaller eyeballs when killed
+- **Eyeball Cluster**: Group of connected small eyes that move together but can be separated by area damage
+- **Spawner**: Stationary eyeball that periodically creates new enemies until destroyed
+
+## ⚡ Elemental/Status Effect Mobs
+- **Frost Eye**: Blue-tinted eyeball that slows nearby towers when it dies
+- **Fire Eye**: Red eyeball that leaves burning trail, damaging towers it passes near
+- **Electric Eye**: Charged eyeball that disables towers briefly when hit by lightning
+
+## 🏃 Movement Variant Mobs
+- **Speed Demon**: Very fast small eyeball with low health
+- **Tank Eye**: Massive slow eyeball with enormous health pool
+- **Teleporter**: Eyeball that occasionally jumps forward along the path
+- **Backwards Walker**: Eyeball that moves backwards, confusing tower targeting
+
+## 🎭 Unique Behavior Mobs
+- **Invisible Stalker**: Eyeball that turns invisible periodically, only visible when attacking or near certain towers
+- **Healer Eye**: Green eyeball that slowly heals nearby damaged enemies
+- **Jammer**: Eyeball that reduces tower range/accuracy when nearby
+- **Berserker**: Gets faster and more dangerous as its health decreases
+
+## 🌟 Boss-Level Mobs
+- **Cyclops King**: Huge single eye with multiple attack phases and special abilities
+- **Eye of the Storm**: Massive eyeball surrounded by smaller orbiting eyes
+- **Ancient Watcher**: Old, scarred eyeball with very high health and immunity to certain damage types
+
+## Implementation Notes
+Each mob type could have:
+- **Unique iris colors/patterns** for visual distinction
+- **Different death effects** (ice shatter, electric zap, etc.)
+- **Special sounds** for movement and death
+- **Tactical counters** - certain towers more/less effective against specific mobs
+
+## Priority Implementation
+Recommended starting mobs for immediate strategic variety:
+1. **Speed Demon** - Fast, low health
+2. **Tank Eye** - Slow, high health  
+3. **Armored Cyclops** - Damage resistance

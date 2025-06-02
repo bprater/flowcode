@@ -131,6 +131,139 @@
             100% { opacity: 0; transform: translate(-50%, -50%) scale(2.5); }
         }
         
+        /* Armored Cyclops Styles */
+        .enemy.armored-cyclops { 
+            width: 45px; height: 45px; 
+        }
+        .enemy.armored-cyclops .enemy-eyeball {
+            width: 40px; height: 40px; 
+            background: radial-gradient(circle at 50% 50%, #e8e8e8 35%, #d0d0d0 45%, #b8b8b8 100%);
+            border: 3px solid #666;
+            position: relative;
+        }
+        .enemy.armored-cyclops .enemy-eyeball::before {
+            content: '';
+            position: absolute;
+            top: -2px; left: -2px; right: -2px; bottom: -2px;
+            border: 2px solid #444;
+            border-radius: 50%;
+            background: linear-gradient(45deg, 
+                rgba(255,255,255,0.3) 0%, 
+                transparent 30%, 
+                rgba(0,0,0,0.2) 70%, 
+                rgba(255,255,255,0.1) 100%);
+        }
+        .enemy.armored-cyclops .enemy-eyeball::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 4px; height: 4px;
+            background: #888;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 
+                17px 0 #888,     /* Right */
+                -17px 0 #888,    /* Left */
+                0 13px #888,     /* Bottom */
+                0 -13px #888,    /* Top */
+                14px 9px #888,   /* Bottom-right (oval) */
+                -14px -9px #888, /* Top-left (oval) */
+                14px -9px #888,  /* Top-right (oval) */
+                -14px 9px #888,  /* Bottom-left (oval) */
+                8px 11px #888,   /* Bottom-right mid */
+                -8px -11px #888, /* Top-left mid */
+                8px -11px #888,  /* Top-right mid */
+                -8px 11px #888;  /* Bottom-left mid */
+        }
+        .enemy.armored-cyclops .enemy-iris {
+            width: 18px; height: 18px;
+            background: radial-gradient(circle at 30% 30%, #8B0000 20%, #550000 80%);
+            border: 2px solid #330000;
+        }
+        .enemy.armored-cyclops .enemy-iris::after {
+            top: 3px; left: 5px;
+            width: 4px; height: 4px;
+        }
+        .enemy.armored-cyclops .enemy-health-bar { 
+            width: 42px; height: 5px;
+            border: 2px solid #c0392b;
+        }
+        
+        .cyclops-death-explosion {
+            position: absolute;
+            width: 80px; height: 80px;
+            background: radial-gradient(circle, #ff8c00 0%, #ff6b00 30%, #cc4400 60%, #881100 100%);
+            border-radius: 50%;
+            animation: cyclops-explode 0.8s ease-out forwards;
+            transform: translate(-50%, -50%);
+            z-index: 150;
+        }
+        .cyclops-death-explosion::before {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 120%; height: 120%;
+            background: radial-gradient(circle, rgba(255,255,255,0.9) 0%, transparent 60%);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: cyclops-flash 0.3s ease-out;
+        }
+        .cyclops-death-explosion::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 140%; height: 140%;
+            border: 3px solid #ff6b00;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: cyclops-shockwave 0.6s ease-out;
+        }
+        @keyframes cyclops-explode {
+            0% { transform: translate(-50%, -50%) scale(0.3); opacity: 1; }
+            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.9; }
+            100% { transform: translate(-50%, -50%) scale(2.2); opacity: 0; }
+        }
+        @keyframes cyclops-flash {
+            0% { opacity: 1; transform: translate(-50%, -50%) scale(0.4); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(1.8); }
+        }
+        @keyframes cyclops-shockwave {
+            0% { opacity: 0.8; transform: translate(-50%, -50%) scale(0.6); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(3); }
+        }
+        
+        .armor-sparks {
+            position: absolute;
+            width: 30px; height: 30px;
+            background: radial-gradient(circle, #ffcc00 0%, #ff8800 40%, transparent 70%);
+            border-radius: 50%;
+            animation: armor-spark-burst 0.3s ease-out forwards;
+            transform: translate(-50%, -50%);
+        }
+        .armor-sparks::before, .armor-sparks::after {
+            content: '';
+            position: absolute;
+            width: 4px; height: 4px;
+            background: #ffaa00;
+            border-radius: 50%;
+        }
+        .armor-sparks::before {
+            top: 10%; left: 20%;
+            animation: spark-particle 0.3s ease-out forwards;
+        }
+        .armor-sparks::after {
+            top: 70%; right: 30%;
+            animation: spark-particle 0.3s ease-out 0.1s forwards;
+        }
+        @keyframes armor-spark-burst {
+            0% { transform: translate(-50%, -50%) scale(0.3); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
+        }
+        @keyframes spark-particle {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(0.3) translate(20px, -15px); opacity: 0; }
+        }
+        
         #game-ui {
             position: absolute;
             top: 10px;
@@ -160,18 +293,120 @@
             flex-direction: column;
             gap: 10px;
             z-index: 200;
-            cursor: move;
             border: 2px solid #444;
+            transition: all 0.3s ease;
+        }
+        
+        #tower-palette.collapsed {
+            padding: 5px 10px;
+        }
+        
+        #tower-palette.collapsed .tower-icon {
+            display: none;
         }
         
         #tower-palette-header {
             color: white;
             font-size: 12px;
-            text-align: center;
             margin-bottom: 5px;
             font-weight: bold;
-            cursor: move;
             user-select: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        #tower-palette-title {
+            cursor: move;
+            flex-grow: 1;
+            text-align: center;
+        }
+        
+        #tower-palette-collapse {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            padding: 2px 4px;
+            border-radius: 3px;
+            transition: background-color 0.2s;
+        }
+        
+        #tower-palette-collapse:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Game Over Modal */
+        #game-over-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: modal-fade-in 0.3s ease-out;
+        }
+        
+        #game-over-content {
+            background-color: #2c3e50;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            color: white;
+            border: 3px solid #34495e;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            max-width: 400px;
+            animation: modal-slide-in 0.3s ease-out;
+        }
+        
+        #game-over-content h2 {
+            color: #e74c3c;
+            margin-top: 0;
+            font-size: 2em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        #game-over-stats {
+            margin: 20px 0;
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        #game-over-stats div {
+            margin: 8px 0;
+            font-size: 1.1em;
+        }
+        
+        #restart-button {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1.1em;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 15px;
+        }
+        
+        #restart-button:hover {
+            background-color: #2ecc71;
+        }
+        
+        @keyframes modal-fade-in {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes modal-slide-in {
+            from { transform: translateY(-50px) scale(0.9); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
         }
         
         .tower-icon {
@@ -669,7 +904,10 @@
         </div>
         
         <div id="tower-palette">
-            <div id="tower-palette-header">TOWERS</div>
+            <div id="tower-palette-header">
+                <div id="tower-palette-title">TOWERS</div>
+                <button id="tower-palette-collapse">▼</button>
+            </div>
             <div class="tower-icon rocket" data-tower-type="rocket">
                 🚀
                 <div class="tower-cost">$100</div>
@@ -782,11 +1020,27 @@
         let globalRecoilMagnitude = 10;
         let globalRecoilDuration = 150;
         
-        const ENEMY_HEALTH_MAX = 300;
-        const ENEMY_SPEED = 0.7;
-        const ENEMY_WIDTH = 30;
-        const ENEMY_HEIGHT = 30;
-        const ENEMY_SPAWN_INTERVAL = 2000;
+        // Enemy type definitions
+        const ENEMY_TYPES = {
+            normal: {
+                health: 300,
+                speed: 0.7,
+                width: 30,
+                height: 30,
+                armor: 0,
+                spawnWeight: 70  // 70% chance
+            },
+            armoredCyclops: {
+                health: 600,
+                speed: 0.4,
+                width: 40,
+                height: 40,
+                armor: 0.3,  // 30% damage reduction
+                spawnWeight: 30  // 30% chance
+            }
+        };
+        
+        const ENEMY_SPAWN_INTERVAL = 1200; // Reduced from 2000 for more challenge
         let lastEnemySpawnTime = 0;
         
         let audioCtx = null;
@@ -945,9 +1199,32 @@
                 icon.addEventListener('touchstart', (e) => startTowerPlacement(e, icon), { passive: false });
             });
             
-            // Setup palette dragging
-            paletteHeader.addEventListener('mousedown', (e) => startPaletteDrag(e));
-            paletteHeader.addEventListener('touchstart', (e) => startPaletteDrag(e), { passive: false });
+            // Setup palette dragging - now only on title
+            const paletteTitle = document.getElementById('tower-palette-title');
+            const paletteCollapseBtn = document.getElementById('tower-palette-collapse');
+            
+            paletteTitle.addEventListener('mousedown', (e) => startPaletteDrag(e));
+            paletteTitle.addEventListener('touchstart', (e) => startPaletteDrag(e), { passive: false });
+            
+            // Setup collapse functionality
+            paletteCollapseBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                togglePaletteCollapse();
+            });
+        }
+        
+        function togglePaletteCollapse() {
+            const palette = document.getElementById('tower-palette');
+            const collapseBtn = document.getElementById('tower-palette-collapse');
+            
+            palette.classList.toggle('collapsed');
+            
+            if (palette.classList.contains('collapsed')) {
+                collapseBtn.textContent = '▶';
+            } else {
+                collapseBtn.textContent = '▼';
+            }
         }
         
         function startPaletteDrag(e) {
@@ -1671,6 +1948,42 @@
                     osc.start(now + 0.02);
                     osc.stop(now + 0.15);
                     break;
+                    
+                case 'cyclops_death':
+                    // Metallic armored explosion with deeper tones
+                    dur = 1.0;
+                    
+                    // Heavy metallic clang
+                    osc = audioCtx.createOscillator();
+                    const metalGain = audioCtx.createGain();
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(120, now);
+                    osc.frequency.exponentialRampToValueAtTime(60, now + 0.3);
+                    metalGain.gain.setValueAtTime(0, now);
+                    metalGain.gain.linearRampToValueAtTime(0.4, now + 0.02);
+                    metalGain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+                    osc.connect(metalGain);
+                    metalGain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                    
+                    // Armor debris scatter
+                    for (let k = 0; k < 8; k++) {
+                        const debrisOsc = audioCtx.createOscillator();
+                        const debrisGain = audioCtx.createGain();
+                        debrisOsc.type = 'sawtooth';
+                        const metalFreq = 800 + Math.random() * 1200;
+                        debrisOsc.frequency.setValueAtTime(metalFreq, now + k * 0.05 + 0.1);
+                        debrisOsc.frequency.exponentialRampToValueAtTime(metalFreq * 0.3, now + k * 0.05 + 0.4);
+                        debrisGain.gain.setValueAtTime(0, now + k * 0.05 + 0.1);
+                        debrisGain.gain.linearRampToValueAtTime(0.15 / (k * 0.3 + 1), now + k * 0.05 + 0.12);
+                        debrisGain.gain.exponentialRampToValueAtTime(0.001, now + k * 0.05 + 0.4);
+                        debrisOsc.connect(debrisGain);
+                        debrisGain.connect(audioCtx.destination);
+                        debrisOsc.start(now + k * 0.05 + 0.1);
+                        debrisOsc.stop(now + k * 0.05 + 0.4);
+                    }
+                    break;
             }
         }
         
@@ -1716,6 +2029,9 @@
             } else if (type === 'lightning_impact') { 
                 effectEl.classList.add('lightning-impact-flash'); 
                 duration = 200; 
+            } else if (type === 'armor_sparks') { 
+                effectEl.classList.add('armor-sparks'); 
+                duration = 300; 
             }
             
             effectEl.style.left = `${x}px`;
@@ -1724,16 +2040,64 @@
             setTimeout(() => effectEl.remove(), duration);
         }
         
-        // Enemy management  
+        // Enemy management
+        function chooseEnemyType() {
+            const totalWeight = Object.values(ENEMY_TYPES).reduce((sum, type) => sum + type.spawnWeight, 0);
+            let random = Math.random() * totalWeight;
+            
+            for (const [typeName, typeData] of Object.entries(ENEMY_TYPES)) {
+                random -= typeData.spawnWeight;
+                if (random <= 0) {
+                    return typeName;
+                }
+            }
+            return 'normal'; // fallback
+        }
+        
+        function applySlowEffect(enemy, slowMultiplier, duration) {
+            enemy.slowEffect.isSlowed = true;
+            enemy.slowEffect.slowMultiplier = slowMultiplier;
+            enemy.slowEffect.slowEndTime = performance.now() + duration;
+            enemy.speed = enemy.baseSpeed * slowMultiplier;
+            
+            // Visual effect - make enemy slightly blue
+            if (enemy.el) {
+                enemy.el.style.filter = 'brightness(0.8) saturate(2) hue-rotate(180deg)';
+            }
+        }
+        
+        function updateSlowEffect(enemy, currentTime) {
+            if (enemy.slowEffect.isSlowed && currentTime >= enemy.slowEffect.slowEndTime) {
+                enemy.slowEffect.isSlowed = false;
+                enemy.slowEffect.slowMultiplier = 1.0;
+                enemy.speed = enemy.baseSpeed;
+                
+                // Remove visual effect
+                if (enemy.el) {
+                    enemy.el.style.filter = '';
+                }
+            }
+        }
+        
         function spawnEnemy() {
             enemyIdCounter++;
+            
+            // Choose enemy type based on spawn weights
+            const enemyType = chooseEnemyType();
+            const enemyStats = ENEMY_TYPES[enemyType];
+            
             const enemyEl = document.createElement('div');
             enemyEl.classList.add('enemy');
             enemyEl.id = `enemy-${enemyIdCounter}`;
             
+            // Add type-specific class
+            if (enemyType === 'armoredCyclops') {
+                enemyEl.classList.add('armored-cyclops');
+            }
+            
             const startPos = getPositionOnPath(0);
-            enemyEl.style.left = `${startPos.x - ENEMY_WIDTH/2}px`;
-            enemyEl.style.top = `${startPos.y - ENEMY_HEIGHT/2}px`;
+            enemyEl.style.left = `${startPos.x - enemyStats.width/2}px`;
+            enemyEl.style.top = `${startPos.y - enemyStats.height/2}px`;
             
             // Create eyeball structure
             const eyeball = document.createElement('div');
@@ -1757,16 +2121,24 @@
                 id: enemyIdCounter,
                 el: enemyEl,
                 irisEl: iris,
+                type: enemyType,
                 x: startPos.x,
                 y: startPos.y,
-                health: ENEMY_HEALTH_MAX,
-                maxHealth: ENEMY_HEALTH_MAX,
-                speed: ENEMY_SPEED,
+                health: enemyStats.health,
+                maxHealth: enemyStats.health,
+                baseSpeed: enemyStats.speed,
+                speed: enemyStats.speed,
+                armor: enemyStats.armor,
                 healthFillEl: healthFill,
                 age: 0,
-                width: ENEMY_WIDTH,
-                height: ENEMY_HEIGHT,
-                pathProgress: 0  // Track progress along path (0 to 1)
+                width: enemyStats.width,
+                height: enemyStats.height,
+                pathProgress: 0,  // Track progress along path (0 to 1)
+                slowEffect: {
+                    isSlowed: false,
+                    slowMultiplier: 1.0,
+                    slowEndTime: 0
+                }
             });
         }
         
@@ -1783,12 +2155,61 @@
             updateUI();
             
             if (lives <= 0) {
-                alert('Game Over! Final Score: ' + score);
-                // Could restart game here
-                lives = 10; // Reset for now
-                score = 0;
-                updateUI();
+                showGameOverModal();
             }
+        }
+        
+        function showGameOverModal() {
+            // Pause the game
+            isPaused = true;
+            
+            // Calculate enemies defeated
+            const enemiesDefeated = Math.floor(score / 10); // Assuming 10 points per normal enemy
+            
+            // Update modal content
+            document.getElementById('final-score').textContent = score;
+            document.getElementById('final-money').textContent = money;
+            document.getElementById('enemies-defeated').textContent = enemiesDefeated;
+            
+            // Show modal
+            const modal = document.getElementById('game-over-modal');
+            modal.style.display = 'flex';
+            
+            // Setup restart button
+            const restartBtn = document.getElementById('restart-button');
+            restartBtn.onclick = restartGame;
+        }
+        
+        function restartGame() {
+            // Reset game state
+            lives = 10;
+            score = 0;
+            money = 500;
+            
+            // Clear enemies and projectiles
+            enemies.forEach(enemy => enemy.el.remove());
+            projectiles.forEach(proj => proj.el.remove());
+            enemies = [];
+            projectiles = [];
+            
+            // Reset tower damage counters
+            towers.forEach(tower => {
+                tower.totalDamage = 0;
+                if (tower.damageEl) {
+                    tower.damageEl.textContent = '0';
+                }
+            });
+            
+            // Hide modal
+            document.getElementById('game-over-modal').style.display = 'none';
+            
+            // Update UI and resume
+            updateUI();
+            isPaused = false;
+            lastTimestamp = performance.now();
+            
+            // Restart with initial enemies
+            initialEnemyFill();
         }
         
         function initialEnemyFill() {
@@ -1801,8 +2222,8 @@
                     const pos = getPositionOnPath(enemy.pathProgress);
                     enemy.x = pos.x;
                     enemy.y = pos.y;
-                    enemy.el.style.left = `${pos.x - ENEMY_WIDTH/2}px`;
-                    enemy.el.style.top = `${pos.y - ENEMY_HEIGHT/2}px`;
+                    enemy.el.style.left = `${pos.x - enemy.width/2}px`;
+                    enemy.el.style.top = `${pos.y - enemy.height/2}px`;
                 }
             }
         }
@@ -1820,6 +2241,9 @@
             for (let i = enemies.length - 1; i >= 0; i--) {
                 const enemy = enemies[i];
                 enemy.age++;
+                
+                // Update slow effects
+                updateSlowEffect(enemy, currentTime);
                 
                 // Move along path
                 const pathLength = pathWaypoints.length - 1;
@@ -1840,8 +2264,8 @@
                 const pos = getPositionOnPath(enemy.pathProgress);
                 enemy.x = pos.x;
                 enemy.y = pos.y;
-                enemy.el.style.left = `${pos.x - ENEMY_WIDTH/2}px`;
-                enemy.el.style.top = `${pos.y - ENEMY_HEIGHT/2}px`;
+                enemy.el.style.left = `${pos.x - enemy.width/2}px`;
+                enemy.el.style.top = `${pos.y - enemy.height/2}px`;
                 
                 const healthPercentage = (enemy.health / enemy.maxHealth) * 100;
                 enemy.healthFillEl.style.width = `${Math.max(0, healthPercentage)}%`;
@@ -1850,12 +2274,17 @@
                 updateEyeballIris(enemy);
                 
                 if (enemy.health <= 0) {
-                    // Create death explosion
-                    createEyeballDeathExplosion(enemy.x, enemy.y);
+                    // Create death explosion based on enemy type
+                    if (enemy.type === 'armoredCyclops') {
+                        createCyclopsDeathExplosion(enemy.x, enemy.y);
+                        score += 20; // More points for tougher enemy
+                        money += 10;
+                    } else {
+                        createEyeballDeathExplosion(enemy.x, enemy.y);
+                        score += 10;
+                        money += 5;
+                    }
                     
-                    // Enemy killed - gain score and money
-                    score += 10;
-                    money += 5;
                     updateUI();
                     enemy.el.remove();
                     enemies.splice(i, 1);
@@ -1928,6 +2357,20 @@
             setTimeout(() => explosion.remove(), 600);
         }
         
+        function createCyclopsDeathExplosion(x, y) {
+            const explosion = document.createElement('div');
+            explosion.classList.add('visual-effect', 'cyclops-death-explosion');
+            explosion.style.left = `${x}px`;
+            explosion.style.top = `${y}px`;
+            
+            gameContainer.appendChild(explosion);
+            
+            // Play explosion sound (more metallic)
+            playSound('cyclops_death');
+            
+            setTimeout(() => explosion.remove(), 800);
+        }
+        
         // Track mouse for iris targeting
         document.addEventListener('mousemove', (e) => {
             const rect = gameContainer.getBoundingClientRect();
@@ -1981,8 +2424,17 @@
         function fireTower(tower, target) {
             if (tower.type === 'lightning') {
                 // Lightning is instant hit with visual bolt
-                const actualDamage = Math.min(tower.damage, target.health);
-                target.health -= tower.damage;
+                // Apply armor damage reduction
+                let finalDamage = tower.damage;
+                if (target.armor > 0) {
+                    finalDamage = tower.damage * (1 - target.armor);
+                    if (target.type === 'armoredCyclops') {
+                        createVisualEffect(target.x + target.width/2, target.y + target.height/2, 'armor_sparks');
+                    }
+                }
+                
+                const actualDamage = Math.min(finalDamage, target.health);
+                target.health -= finalDamage;
                 updateTowerDamage(tower, actualDamage);
                 
                 // Create lightning bolt visual
@@ -2182,8 +2634,18 @@
                 
                 // Check for impact
                 if (distance < moveSpeed + (targetEnemy.width / 3)) {
-                    const actualDamage = Math.min(proj.damage, targetEnemy.health);
-                    targetEnemy.health -= proj.damage;
+                    // Apply armor damage reduction
+                    let finalDamage = proj.damage;
+                    if (targetEnemy.armor > 0) {
+                        finalDamage = proj.damage * (1 - targetEnemy.armor);
+                        // Show reduced damage effect for armored enemies
+                        if (targetEnemy.type === 'armoredCyclops') {
+                            createVisualEffect(targetX, targetY, 'armor_sparks');
+                        }
+                    }
+                    
+                    const actualDamage = Math.min(finalDamage, targetEnemy.health);
+                    targetEnemy.health -= finalDamage;
                     updateTowerDamage(proj.tower, actualDamage);
                     
                     createVisualEffect(targetX, targetY, 'enemy_hit_sparkle');
@@ -2195,6 +2657,8 @@
                     } else if (proj.towerType === 'ice') {
                         createVisualEffect(targetX, targetY, 'ice_shatter');
                         playSound('ice_impact');
+                        // Apply ice slow effect
+                        applySlowEffect(targetEnemy, 0.5, 2000); // 50% speed for 2 seconds
                     } else if (proj.towerType === 'machinegun') {
                         createVisualEffect(targetX, targetY, 'bullet_impact');
                         playSound('bullet_impact');
@@ -2400,5 +2864,18 @@
             pauseButtonBottom.addEventListener('click', togglePauseState);
         }
     </script>
+    
+    <!-- Game Over Modal -->
+    <div id="game-over-modal">
+        <div id="game-over-content">
+            <h2>GAME OVER</h2>
+            <div id="game-over-stats">
+                <div>Final Score: <span id="final-score">0</span></div>
+                <div>Money Earned: $<span id="final-money">0</span></div>
+                <div>Enemies Defeated: <span id="enemies-defeated">0</span></div>
+            </div>
+            <button id="restart-button">Play Again</button>
+        </div>
+    </div>
 </body>
 </html>
