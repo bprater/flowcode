@@ -25,34 +25,237 @@
         }
 
         #game-container { 
-            position: relative; width: 800px; height: 450px; 
+            position: relative; width: 1000px; height: 600px; 
             background-color: #5DAD36; 
             background-image: linear-gradient(to bottom, #76C84D 0%, #5DAD36 60%, #488A29 100%); 
             border: 2px solid #333; overflow: hidden; margin-top:10px; 
         }
-        #path { 
-            position: absolute; bottom: 30px; left: 0; width: 100%; height: 60px; 
-            background-color: #b08d57; border-top: 1px dashed #8a6d40; 
-            border-bottom: 1px dashed #8a6d40; 
+        .path-segment {
+            position: absolute;
+            background-color: #b08d57;
+            border-radius: 20px;
+            box-shadow: inset 0 0 10px rgba(138, 109, 64, 0.3);
+        }
+        
+        .path-waypoint {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background-color: #ff6b6b;
+            border-radius: 50%;
+            z-index: 10;
         }
 
         .enemy { 
-            position: absolute; width: 30px; height: 30px; 
-            background-color: #2ecc71; border: 1px solid #27ae60; 
-            border-radius: 5px; display: flex; flex-direction: column; 
-            align-items: center; justify-content: center; box-sizing: border-box; 
-            font-size: 10px; color: white; transition: filter 0.1s; 
+            position: absolute; width: 35px; height: 35px; 
+            display: flex; flex-direction: column; align-items: center; 
+            transition: filter 0.1s; 
+        }
+        .enemy-eyeball {
+            width: 30px; height: 30px; 
+            background: radial-gradient(circle at 50% 50%, #ffffff 45%, #f0f0f0 50%, #e0e0e0 100%);
+            border: 2px solid #333;
+            border-radius: 50%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.8);
+        }
+        .enemy-iris {
+            width: 12px; height: 12px;
+            background: radial-gradient(circle at 30% 30%, #4a90e2 20%, #2c5aa0 80%);
+            border-radius: 50%;
+            position: relative;
+            transition: transform 0.1s ease-out;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.4);
+        }
+        .enemy-iris::after {
+            content: '';
+            position: absolute;
+            top: 2px; left: 3px;
+            width: 3px; height: 3px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 50%;
+            box-shadow: 1px 1px 1px rgba(255,255,255,0.6);
         }
         .enemy-health-bar { 
-            width: 90%; height: 5px; background-color: #e74c3c; 
-            border: 1px solid #c0392b; margin-top: 2px; 
+            width: 32px; height: 4px; background-color: #e74c3c; 
+            border: 1px solid #c0392b; margin-top: 3px;
+            border-radius: 2px;
         }
-        .enemy-health-fill { width: 100%; height: 100%; background-color: #2ecc71; }
+        .enemy-health-fill { 
+            width: 100%; height: 100%; background-color: #2ecc71; 
+            border-radius: 1px; transition: width 0.2s ease;
+        }
+        .eyeball-death-explosion {
+            position: absolute;
+            width: 60px; height: 60px;
+            background: radial-gradient(circle, #ff6b6b 0%, #ff4757 30%, #ff3742 60%, #c23616 100%);
+            border-radius: 50%;
+            animation: eyeball-explode 0.6s ease-out forwards;
+            transform: translate(-50%, -50%);
+            z-index: 150;
+        }
+        .eyeball-death-explosion::before {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 100%; height: 100%;
+            background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, transparent 70%);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: eyeball-flash 0.2s ease-out;
+        }
+        .eyeball-death-explosion::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 120%; height: 120%;
+            border: 2px solid #ff4757;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: eyeball-shockwave 0.4s ease-out;
+        }
+        @keyframes eyeball-explode {
+            0% { transform: translate(-50%, -50%) scale(0.3); opacity: 1; }
+            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.8; }
+            100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
+        }
+        @keyframes eyeball-flash {
+            0% { opacity: 1; transform: translate(-50%, -50%) scale(0.5); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); }
+        }
+        @keyframes eyeball-shockwave {
+            0% { opacity: 0.6; transform: translate(-50%, -50%) scale(0.8); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(2.5); }
+        }
+        
+        #game-ui {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 150;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 16px;
+        }
+        
+        #lives-display {
+            color: #ff4444;
+            font-weight: bold;
+        }
+        
+        #tower-palette {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(0, 0, 0, 0.9);
+            padding: 10px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 200;
+            cursor: move;
+            border: 2px solid #444;
+        }
+        
+        #tower-palette-header {
+            color: white;
+            font-size: 12px;
+            text-align: center;
+            margin-bottom: 5px;
+            font-weight: bold;
+            cursor: move;
+            user-select: none;
+        }
+        
+        .tower-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            cursor: grab;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            border: 2px solid #666;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        
+        .tower-icon:hover {
+            transform: scale(1.1);
+            border-color: #fff;
+        }
+        
+        .tower-icon.dragging {
+            cursor: grabbing;
+            opacity: 0.7;
+        }
+        
+        .tower-icon.rocket {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #A0522D 0%, #8B4513 100%);
+            color: #FFE4B5;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+            font-size: 22px;
+        }
+        
+        .tower-icon.ice {
+            background: linear-gradient(180deg, #C0E0FF 0%, #A0C0FF 100%);
+            box-shadow: 0 0 10px rgba(173, 216, 230, 0.6);
+        }
+        
+        .tower-icon.lightning {
+            background: linear-gradient(135deg, #404058 0%, #202030 100%);
+            box-shadow: 0 0 8px #7DF9FF;
+        }
+        
+        .tower-icon.machinegun {
+            background: linear-gradient(135deg, #556B2F 0%, #2F4F2F 100%);
+        }
+        
+        .tower-cost {
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            background: #ff6b6b;
+            color: white;
+            font-size: 10px;
+            padding: 1px 4px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
 
         #controls { 
             display: flex; flex-wrap: wrap; justify-content: space-around; 
-            width: 800px; margin-top: 10px; padding: 10px; 
+            width: 1000px; margin-top: 10px; padding: 10px; 
             background-color: #e0e0e0; border-radius: 5px; 
+            max-height: 200px; overflow-y: auto;
+            transition: max-height 0.3s ease;
+        }
+        
+        #controls.collapsed {
+            max-height: 50px;
+            overflow: hidden;
+        }
+        
+        #controls-toggle {
+            width: 100%;
+            text-align: center;
+            padding: 10px;
+            cursor: pointer;
+            background-color: #d0d0d0;
+            border: none;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            font-weight: bold;
         }
         .control-group { 
             border: 1px solid #ccc; padding: 10px; border-radius: 5px; 
@@ -90,10 +293,60 @@
             position: absolute; width: 45px; height: 45px; border-radius: 50%; 
             display: flex; align-items: center; justify-content: center; 
             box-shadow: 0 3px 6px rgba(0,0,0,0.4), inset 0 2px 4px rgba(0,0,0,0.2); 
-            top: 50px; 
             cursor: grab;
             user-select: none;
             transition: transform 0.1s ease;
+        }
+        
+        /* Type-specific tower base styles */
+        .tower-base[id*="rocket"] { 
+            background: linear-gradient(135deg, #A0522D 0%, #8B4513 100%); 
+        }
+        .tower-base[id*="rocket"]::before { 
+            content: ''; position: absolute; width: 8px; height: 8px; 
+            background: #696969; border-radius: 50%; 
+            box-shadow: 15px 0 #696969, -15px 0 #696969, 0 15px #696969, 0 -15px #696969; 
+        }
+        
+        .tower-base[id*="ice"] { 
+            background: linear-gradient(180deg, #C0E0FF 0%, #A0C0FF 100%); 
+            box-shadow: 0 0 15px 5px rgba(173, 216, 230, 0.6), inset 0 0 10px rgba(255,255,255,0.5); 
+            border: 2px solid #ADD8E6; 
+        }
+        .tower-base[id*="ice"]::before, .tower-base[id*="ice"]::after { 
+            content: ''; position: absolute; width: 0; height: 0; 
+            border-left: 8px solid transparent; border-right: 8px solid transparent; 
+            border-bottom: 15px solid rgba(200, 230, 255, 0.7); opacity: 0.8; 
+        }
+        .tower-base[id*="ice"]::before { transform: rotate(30deg) translate(18px, -15px); }
+        .tower-base[id*="ice"]::after { transform: rotate(-40deg) translate(-15px, -18px) scaleX(-1); }
+        
+        .tower-base[id*="lightning"] { 
+            background: linear-gradient(135deg, #404058 0%, #202030 100%); 
+            border: 2px solid #606070; 
+            box-shadow: 0 3px 6px rgba(0,0,0,0.5), inset 0 2px 4px rgba(0,0,0,0.3), 0 0 8px #7DF9FF; 
+            animation: subtle-pulse-base-lightning 4s infinite alternate ease-in-out; 
+        }
+        .tower-base[id*="lightning"]::after, .tower-base[id*="lightning"]::before { 
+            content: ''; position: absolute; width: 5px; height: 110%; 
+            background: linear-gradient(to bottom, rgba(125, 249, 255, 0.2), rgba(0, 191, 255, 0.4)); 
+            border-radius: 3px; box-shadow: 0 0 2px #00BFFF, 0 0 4px #7DF9FF; opacity: 0.6; 
+        }
+        .tower-base[id*="lightning"]::after { transform: rotate(35deg); }
+        .tower-base[id*="lightning"]::before { transform: rotate(-35deg); }
+        @keyframes subtle-pulse-base-lightning { 
+            0% { box-shadow: 0 3px 6px rgba(0,0,0,0.5), inset 0 2px 4px rgba(0,0,0,0.3), 0 0 8px #7DF9FF; } 
+            100% { box-shadow: 0 3px 6px rgba(0,0,0,0.5), inset 0 2px 4px rgba(0,0,0,0.3), 0 0 20px #00FFFF; } 
+        }
+        
+        .tower-base[id*="machinegun"] { 
+            background: linear-gradient(135deg, #556B2F 0%, #2F4F2F 100%); 
+            border: 2px solid #1C3A1C; 
+        }
+        .tower-base[id*="machinegun"]::before { 
+            content: ''; position: absolute; width: 10px; height: 10px; 
+            background: #8B4513; border-radius: 50%; 
+            box-shadow: 12px 0 #654321, -12px 0 #654321, 0 12px #654321, 0 -12px #654321; 
         }
         
         .tower-base:hover {
@@ -409,42 +662,36 @@
 <body>
     <h1>TD Simulator - Modular Turret System</h1>
     <div id="game-container">
-        <div id="path"></div>
-        
-        <div id="tower-rocket-base" class="tower-base" style="left: 100px;">
-            <div class="turret-pivot">
-                <div class="turret-model turret-rocket">
-                    <div class="turret-glow-indicator"></div>
-                </div>
-            </div>
+        <div id="game-ui">
+            <div>Lives: <span id="lives-display">10</span></div>
+            <div>Score: <span id="score-display">0</span></div>
+            <div>Money: $<span id="money-display">500</span></div>
         </div>
         
-        <div id="tower-ice-base" class="tower-base" style="left: 277.5px;">
-            <div class="turret-pivot">
-                <div class="turret-model turret-ice">
-                    <div class="turret-glow-indicator"></div>
-                </div>
+        <div id="tower-palette">
+            <div id="tower-palette-header">TOWERS</div>
+            <div class="tower-icon rocket" data-tower-type="rocket">
+                🚀
+                <div class="tower-cost">$100</div>
+            </div>
+            <div class="tower-icon ice" data-tower-type="ice">
+                ❄️
+                <div class="tower-cost">$75</div>
+            </div>
+            <div class="tower-icon lightning" data-tower-type="lightning">
+                ⚡
+                <div class="tower-cost">$150</div>
+            </div>
+            <div class="tower-icon machinegun" data-tower-type="machinegun">
+                🔫
+                <div class="tower-cost">$50</div>
             </div>
         </div>
-        
-        <div id="tower-lightning-base" class="tower-base" style="left: 455px;">
-            <div class="turret-pivot">
-                <div class="turret-model turret-lightning-barrel">
-                    <div class="turret-glow-indicator"></div>
-                </div>
-            </div>
-        </div>
-        
-        <div id="tower-machinegun-base" class="tower-base" style="left: 632.5px;">
-            <div class="turret-pivot">
-                <div class="turret-model turret-machinegun">
-                    <div class="turret-glow-indicator"></div>
-                </div>
-            </div>
-        </div>
+        <div id="path-container"></div>
     </div>
     
     <div id="controls">
+        <button id="controls-toggle">▼ Show/Hide Controls ▼</button>
         
         <div class="control-group" id="rocket-controls">
             <h3>Rocket Tower 🚀</h3>
@@ -513,13 +760,19 @@
     <script>
         // Simple standalone tower defense system
         const gameContainer = document.getElementById('game-container');
-        const pathEl = document.getElementById('path');
+        const pathContainer = document.getElementById('path-container');
         const pauseButtonBottom = document.getElementById('pause-button-bottom');
+        const livesDisplay = document.getElementById('lives-display');
+        const scoreDisplay = document.getElementById('score-display');
         
-        let pathTop = 0; 
-        let pathHeight = 0;
         const gameWidth = gameContainer.offsetWidth;
         const gameHeight = gameContainer.offsetHeight;
+        
+        // Game state
+        let lives = 10;
+        let score = 0;
+        let money = 500;
+        let towerIdCounter = 0;
         
         let enemies = [];
         let projectiles = [];
@@ -553,69 +806,445 @@
             offsetY: 0
         };
         
-        // Simple tower system
-        const towers = [
-            { 
-                id: 'tower-rocket', 
-                type: 'rocket',
-                baseEl: null, pivotEl: null, modelEl: null, glowEl: null, damageEl: null,
-                x: 0, y: 0,
-                fireRate: 1500, damage: 70, range: 400, barrelLength: 16,
-                lastShotTime: 0, currentAngleRad: -Math.PI / 2, chargeLevel: 0, totalDamage: 0,
-                disabled: false
-            },
-            { 
-                id: 'tower-ice', 
-                type: 'ice',
-                baseEl: null, pivotEl: null, modelEl: null, glowEl: null, damageEl: null,
-                x: 0, y: 0,
-                fireRate: 900, damage: 20, range: 400, barrelLength: 15,
-                lastShotTime: 0, currentAngleRad: -Math.PI / 2, chargeLevel: 0, totalDamage: 0,
-                splashRadius: 70, splashDamageFactor: 0.5, disabled: false
-            },
-            { 
-                id: 'tower-lightning', 
-                type: 'lightning',
-                baseEl: null, pivotEl: null, modelEl: null, glowEl: null, damageEl: null,
-                x: 0, y: 0,
-                fireRate: 700, damage: 35, range: 400, barrelLength: 20,
-                lastShotTime: 0, currentAngleRad: -Math.PI / 2, chargeLevel: 0, totalDamage: 0,
-                disabled: false
-            },
-            { 
-                id: 'tower-machinegun', 
-                type: 'machinegun',
-                baseEl: null, pivotEl: null, modelEl: null, glowEl: null, damageEl: null,
-                x: 0, y: 0,
-                fireRate: 200, damage: 8, range: 350, barrelLength: 18,
-                lastShotTime: 0, currentAngleRad: -Math.PI / 2, chargeLevel: 0, totalDamage: 0,
-                disabled: false
-            }
+        // Tower placement state
+        let placementState = {
+            isPlacing: false,
+            placingType: null,
+            previewTower: null
+        };
+        
+        // Palette drag state
+        let paletteState = {
+            isDragging: false,
+            offsetX: 0,
+            offsetY: 0
+        };
+        
+        // Path system - complex winding path
+        const pathWaypoints = [
+            { x: 0, y: 450 },           // Start (left side, middle-bottom)
+            { x: 200, y: 450 },         // Go right
+            { x: 200, y: 300 },         // Go up
+            { x: 400, y: 300 },         // Go right
+            { x: 400, y: 150 },         // Go up
+            { x: 650, y: 150 },         // Go right
+            { x: 650, y: 400 },         // Go down
+            { x: 850, y: 400 },         // Go right
+            { x: 850, y: 200 },         // Go up
+            { x: 1000, y: 200 }         // End (right side)
         ];
         
-        // Initialize towers
-        function initializeTowers() {
-            towers.forEach(tower => {
-                tower.baseEl = document.getElementById(`tower-${tower.type}-base`);
-                tower.pivotEl = document.querySelector(`#tower-${tower.type}-base .turret-pivot`);
-                tower.modelEl = document.querySelector(`#tower-${tower.type}-base .turret-model`);
-                tower.glowEl = document.querySelector(`#tower-${tower.type}-base .turret-glow-indicator`);
-                tower.damageEl = document.querySelector(`#${tower.type}-damage-meter .damage-value`);
-                
-                if (tower.baseEl) {
-                    tower.x = tower.baseEl.offsetLeft + tower.baseEl.offsetWidth / 2;
-                    tower.y = tower.baseEl.offsetTop + tower.baseEl.offsetHeight / 2;
-                }
-                
-                if (tower.pivotEl) {
-                    tower.pivotEl.style.transform = `rotate(${tower.currentAngleRad - Math.PI/2}rad)`;
-                }
-                
-                // Add drag and drop event handlers
-                if (tower.baseEl) {
-                    setupDragAndDrop(tower);
+        // Tower system - now supports multiple towers per type
+        const towers = [];
+        
+        // Tower costs and default stats
+        const towerDefaults = {
+            rocket: { fireRate: 1500, damage: 70, range: 400, barrelLength: 16, cost: 100 },
+            ice: { fireRate: 900, damage: 20, range: 400, barrelLength: 15, cost: 75, splashRadius: 70, splashDamageFactor: 0.5 },
+            lightning: { fireRate: 700, damage: 35, range: 400, barrelLength: 20, cost: 150 },
+            machinegun: { fireRate: 200, damage: 8, range: 350, barrelLength: 18, cost: 50 }
+        };
+        
+        // Initialize starter towers (existing ones)
+        function initializeStarterTowers() {
+            const starterTowers = [
+                { type: 'rocket', x: 125, y: 95 },
+                { type: 'ice', x: 402.5, y: 95 },
+                { type: 'lightning', x: 680, y: 95 },
+                { type: 'machinegun', x: 957.5, y: 95 }
+            ];
+            
+            starterTowers.forEach(starter => {
+                const tower = createTower(starter.type, starter.x, starter.y, true);
+                if (tower) {
+                    towers.push(tower);
                 }
             });
+        }
+        
+        // Create a new tower
+        function createTower(type, x, y, isStarter = false) {
+            if (!isStarter && money < towerDefaults[type].cost) {
+                return null; // Not enough money
+            }
+            
+            towerIdCounter++;
+            const towerId = `tower-${type}-${towerIdCounter}`;
+            
+            // Create tower DOM element
+            const baseEl = document.createElement('div');
+            baseEl.id = towerId;
+            baseEl.classList.add('tower-base');
+            baseEl.style.left = `${x - 22.5}px`;
+            baseEl.style.top = `${y - 22.5}px`;
+            
+            const pivotEl = document.createElement('div');
+            pivotEl.classList.add('turret-pivot');
+            
+            const modelEl = document.createElement('div');
+            modelEl.classList.add('turret-model');
+            
+            // Add type-specific classes
+            if (type === 'rocket') {
+                modelEl.classList.add('turret-rocket');
+            } else if (type === 'ice') {
+                modelEl.classList.add('turret-ice');
+            } else if (type === 'lightning') {
+                modelEl.classList.add('turret-lightning-barrel');
+            } else if (type === 'machinegun') {
+                modelEl.classList.add('turret-machinegun');
+            }
+            
+            const glowEl = document.createElement('div');
+            glowEl.classList.add('turret-glow-indicator');
+            
+            modelEl.appendChild(glowEl);
+            pivotEl.appendChild(modelEl);
+            baseEl.appendChild(pivotEl);
+            gameContainer.appendChild(baseEl);
+            
+            // Create tower object
+            const tower = {
+                id: towerId,
+                type: type,
+                baseEl: baseEl,
+                pivotEl: pivotEl,
+                modelEl: modelEl,
+                glowEl: glowEl,
+                x: x,
+                y: y,
+                ...towerDefaults[type],
+                lastShotTime: 0,
+                currentAngleRad: -Math.PI / 2,
+                chargeLevel: 0,
+                totalDamage: 0,
+                disabled: false
+            };
+            
+            // Deduct cost if not a starter tower
+            if (!isStarter) {
+                money -= towerDefaults[type].cost;
+                updateUI();
+            }
+            
+            // Setup drag and drop
+            setupDragAndDrop(tower);
+            
+            return tower;
+        }
+        
+        // Setup tower palette drag functionality
+        function setupTowerPalette() {
+            const towerIcons = document.querySelectorAll('.tower-icon');
+            const palette = document.getElementById('tower-palette');
+            const paletteHeader = document.getElementById('tower-palette-header');
+            
+            // Setup tower placement from icons
+            towerIcons.forEach(icon => {
+                icon.addEventListener('mousedown', (e) => startTowerPlacement(e, icon));
+                icon.addEventListener('touchstart', (e) => startTowerPlacement(e, icon), { passive: false });
+            });
+            
+            // Setup palette dragging
+            paletteHeader.addEventListener('mousedown', (e) => startPaletteDrag(e));
+            paletteHeader.addEventListener('touchstart', (e) => startPaletteDrag(e), { passive: false });
+        }
+        
+        function startPaletteDrag(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const palette = document.getElementById('tower-palette');
+            const rect = palette.getBoundingClientRect();
+            const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
+            
+            paletteState.isDragging = true;
+            paletteState.offsetX = clientX - rect.left;
+            paletteState.offsetY = clientY - rect.top;
+            
+            document.addEventListener('mousemove', paletteDragMove);
+            document.addEventListener('touchmove', paletteDragMove, { passive: false });
+            document.addEventListener('mouseup', paletteDragEnd);
+            document.addEventListener('touchend', paletteDragEnd);
+        }
+        
+        function paletteDragMove(e) {
+            if (!paletteState.isDragging) return;
+            
+            e.preventDefault();
+            
+            const palette = document.getElementById('tower-palette');
+            const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
+            
+            let newX = clientX - paletteState.offsetX;
+            let newY = clientY - paletteState.offsetY;
+            
+            // Keep palette within window bounds
+            newX = Math.max(0, Math.min(window.innerWidth - palette.offsetWidth, newX));
+            newY = Math.max(0, Math.min(window.innerHeight - palette.offsetHeight, newY));
+            
+            palette.style.left = `${newX}px`;
+            palette.style.top = `${newY}px`;
+            palette.style.right = 'auto'; // Remove right positioning
+        }
+        
+        function paletteDragEnd() {
+            if (!paletteState.isDragging) return;
+            
+            paletteState.isDragging = false;
+            
+            document.removeEventListener('mousemove', paletteDragMove);
+            document.removeEventListener('touchmove', paletteDragMove);
+            document.removeEventListener('mouseup', paletteDragEnd);
+            document.removeEventListener('touchend', paletteDragEnd);
+        }
+        
+        function startTowerPlacement(e, icon) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const towerType = icon.dataset.towerType;
+            const cost = towerDefaults[towerType].cost;
+            
+            if (money < cost) {
+                // Flash red or show message
+                icon.style.filter = 'brightness(0.5) sepia(1) hue-rotate(0deg)';
+                setTimeout(() => icon.style.filter = '', 200);
+                return;
+            }
+            
+            placementState.isPlacing = true;
+            placementState.placingType = towerType;
+            
+            // Create preview immediately
+            const gameRect = gameContainer.getBoundingClientRect();
+            const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
+            
+            const x = clientX - gameRect.left;
+            const y = clientY - gameRect.top;
+            
+            placementState.previewTower = document.createElement('div');
+            placementState.previewTower.classList.add('tower-base');
+            placementState.previewTower.style.opacity = '0.7';
+            placementState.previewTower.style.pointerEvents = 'none';
+            placementState.previewTower.style.zIndex = '999';
+            placementState.previewTower.style.left = `${x - 22.5}px`;
+            placementState.previewTower.style.top = `${y - 22.5}px`;
+            gameContainer.appendChild(placementState.previewTower);
+            
+            // Add global event listeners for placement
+            document.addEventListener('mousemove', placementMove);
+            document.addEventListener('touchmove', placementMove, { passive: false });
+            document.addEventListener('mouseup', placementEnd);
+            document.addEventListener('touchend', placementEnd);
+        }
+        
+        function placementMove(e) {
+            if (!placementState.isPlacing || !placementState.previewTower) return;
+            
+            e.preventDefault();
+            
+            const rect = gameContainer.getBoundingClientRect();
+            const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
+            
+            const x = clientX - rect.left;
+            const y = clientY - rect.top;
+            
+            // Update preview tower position
+            placementState.previewTower.style.left = `${x - 22.5}px`;
+            placementState.previewTower.style.top = `${y - 22.5}px`;
+            
+            // Visual feedback for valid/invalid placement
+            if (isValidTowerPosition(x, y)) {
+                placementState.previewTower.style.borderColor = '#00ff00';
+                placementState.previewTower.style.border = '2px solid #00ff00';
+            } else {
+                placementState.previewTower.style.borderColor = '#ff0000';
+                placementState.previewTower.style.border = '2px solid #ff0000';
+            }
+        }
+        
+        function placementClick(e) {
+            if (!placementState.isPlacing) return;
+            
+            const rect = gameContainer.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            // Check if position is valid (not on path, not too close to other towers)
+            if (isValidTowerPosition(x, y)) {
+                const newTower = createTower(placementState.placingType, x, y);
+                if (newTower) {
+                    towers.push(newTower);
+                }
+            }
+            
+            // End placement
+            placementEnd();
+        }
+        
+        function placementEnd(e) {
+            if (!placementState.isPlacing) return;
+            
+            // Try to place the tower at the current position
+            if (e && placementState.previewTower) {
+                const rect = gameContainer.getBoundingClientRect();
+                const clientX = e.type === 'touchend' ? e.changedTouches[0].clientX : e.clientX;
+                const clientY = e.type === 'touchend' ? e.changedTouches[0].clientY : e.clientY;
+                
+                const x = clientX - rect.left;
+                const y = clientY - rect.top;
+                
+                // Check if position is valid and create tower
+                if (isValidTowerPosition(x, y)) {
+                    const newTower = createTower(placementState.placingType, x, y);
+                    if (newTower) {
+                        towers.push(newTower);
+                    }
+                }
+            }
+            
+            // Clean up preview tower
+            if (placementState.previewTower) {
+                placementState.previewTower.remove();
+                placementState.previewTower = null;
+            }
+            
+            // Reset placement state
+            placementState.isPlacing = false;
+            placementState.placingType = null;
+            
+            // Remove global event listeners
+            document.removeEventListener('mousemove', placementMove);
+            document.removeEventListener('touchmove', placementMove);
+            document.removeEventListener('mouseup', placementEnd);
+            document.removeEventListener('touchend', placementEnd);
+            document.removeEventListener('click', placementClick);
+        }
+        
+        function isValidTowerPosition(x, y) {
+            // Check if too close to other towers
+            for (const tower of towers) {
+                const distance = Math.sqrt(Math.pow(x - tower.x, 2) + Math.pow(y - tower.y, 2));
+                if (distance < 60) { // Minimum distance between towers
+                    return false;
+                }
+            }
+            
+            // Check if on path (basic check - could be more sophisticated)
+            for (let i = 0; i < pathWaypoints.length - 1; i++) {
+                const start = pathWaypoints[i];
+                const end = pathWaypoints[i + 1];
+                
+                // Simple distance to line segment check
+                const distToPath = distanceToLineSegment(x, y, start.x, start.y, end.x, end.y);
+                if (distToPath < 40) { // Too close to path
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+        
+        function distanceToLineSegment(px, py, x1, y1, x2, y2) {
+            const A = px - x1;
+            const B = py - y1;
+            const C = x2 - x1;
+            const D = y2 - y1;
+            
+            const dot = A * C + B * D;
+            const lenSq = C * C + D * D;
+            
+            if (lenSq === 0) return Math.sqrt(A * A + B * B);
+            
+            let param = dot / lenSq;
+            param = Math.max(0, Math.min(1, param));
+            
+            const xx = x1 + param * C;
+            const yy = y1 + param * D;
+            
+            const dx = px - xx;
+            const dy = py - yy;
+            
+            return Math.sqrt(dx * dx + dy * dy);
+        }
+        
+        // Create visual path
+        function createPath() {
+            pathContainer.innerHTML = '';
+            
+            // Draw path segments between waypoints with better continuity
+            for (let i = 0; i < pathWaypoints.length - 1; i++) {
+                const start = pathWaypoints[i];
+                const end = pathWaypoints[i + 1];
+                
+                const segment = document.createElement('div');
+                segment.classList.add('path-segment');
+                
+                const isHorizontal = Math.abs(end.x - start.x) > Math.abs(end.y - start.y);
+                const pathWidth = 50;
+                
+                if (isHorizontal) {
+                    const width = Math.abs(end.x - start.x) + pathWidth;
+                    segment.style.left = `${Math.min(start.x, end.x) - pathWidth/2}px`;
+                    segment.style.top = `${start.y - pathWidth/2}px`;
+                    segment.style.width = `${width}px`;
+                    segment.style.height = `${pathWidth}px`;
+                } else {
+                    const height = Math.abs(end.y - start.y) + pathWidth;
+                    segment.style.left = `${start.x - pathWidth/2}px`;
+                    segment.style.top = `${Math.min(start.y, end.y) - pathWidth/2}px`;
+                    segment.style.width = `${pathWidth}px`;
+                    segment.style.height = `${height}px`;
+                }
+                
+                pathContainer.appendChild(segment);
+            }
+            
+            // Add corner connectors for better visual continuity
+            for (let i = 1; i < pathWaypoints.length - 1; i++) {
+                const corner = document.createElement('div');
+                corner.classList.add('path-segment');
+                corner.style.left = `${pathWaypoints[i].x - 25}px`;
+                corner.style.top = `${pathWaypoints[i].y - 25}px`;
+                corner.style.width = '50px';
+                corner.style.height = '50px';
+                corner.style.borderRadius = '25px';
+                pathContainer.appendChild(corner);
+            }
+        }
+        
+        // Get position along path based on progress (0 to 1)
+        function getPositionOnPath(progress) {
+            if (progress <= 0) return { x: pathWaypoints[0].x, y: pathWaypoints[0].y };
+            if (progress >= 1) return { x: pathWaypoints[pathWaypoints.length - 1].x, y: pathWaypoints[pathWaypoints.length - 1].y };
+            
+            const totalSegments = pathWaypoints.length - 1;
+            const segmentProgress = progress * totalSegments;
+            const currentSegment = Math.floor(segmentProgress);
+            const segmentFraction = segmentProgress - currentSegment;
+            
+            if (currentSegment >= totalSegments) {
+                return { x: pathWaypoints[pathWaypoints.length - 1].x, y: pathWaypoints[pathWaypoints.length - 1].y };
+            }
+            
+            const start = pathWaypoints[currentSegment];
+            const end = pathWaypoints[currentSegment + 1];
+            
+            return {
+                x: start.x + (end.x - start.x) * segmentFraction,
+                y: start.y + (end.y - start.y) * segmentFraction
+            };
+        }
+        
+        // Initialize towers (no longer needed with new system)
+        function initializeTowers() {
+            // Initialize starter towers
+            initializeStarterTowers();
         }
         
         // Update tower damage display
@@ -1000,6 +1629,48 @@
                     osc.start(now);
                     osc.stop(now + dur);
                     break;
+                    
+                case 'eyeball_death':
+                    // Squelchy organic explosion with wet splat
+                    dur = 0.8;
+                    
+                    // Wet splat sound
+                    noiseSource = audioCtx.createBufferSource();
+                    buffer = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.4, audioCtx.sampleRate);
+                    output = buffer.getChannelData(0);
+                    for (let i = 0; i < buffer.length; i++) {
+                        output[i] = (Math.random() * 2 - 1) * Math.exp(-i / (buffer.length * 0.2));
+                    }
+                    noiseSource.buffer = buffer;
+                    filter = audioCtx.createBiquadFilter();
+                    filter.type = "lowpass";
+                    filter.frequency.setValueAtTime(600, now);
+                    filter.frequency.exponentialRampToValueAtTime(150, now + 0.4);
+                    filter.Q.value = 2;
+                    gain = audioCtx.createGain();
+                    noiseSource.connect(filter);
+                    filter.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    gain.gain.setValueAtTime(0, now);
+                    gain.gain.linearRampToValueAtTime(0.5, now + 0.01);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+                    noiseSource.start(now);
+                    noiseSource.stop(now + 0.4);
+                    
+                    // Organic pop sound
+                    osc = audioCtx.createOscillator();
+                    const popGain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(200, now + 0.02);
+                    osc.frequency.exponentialRampToValueAtTime(80, now + 0.15);
+                    popGain.gain.setValueAtTime(0, now + 0.02);
+                    popGain.gain.linearRampToValueAtTime(0.3, now + 0.04);
+                    popGain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+                    osc.connect(popGain);
+                    popGain.connect(audioCtx.destination);
+                    osc.start(now + 0.02);
+                    osc.stop(now + 0.15);
+                    break;
             }
         }
         
@@ -1053,24 +1724,26 @@
             setTimeout(() => effectEl.remove(), duration);
         }
         
-        // Enemy management
-        function updatePathPosition() {
-            if (pathEl) {
-                pathTop = pathEl.offsetTop;
-                pathHeight = pathEl.offsetHeight;
-            }
-        }
-        
+        // Enemy management  
         function spawnEnemy() {
-            if (pathHeight === 0 && pathTop === 0 && enemies.length < 1) return;
-            
             enemyIdCounter++;
             const enemyEl = document.createElement('div');
             enemyEl.classList.add('enemy');
             enemyEl.id = `enemy-${enemyIdCounter}`;
-            enemyEl.style.left = `${gameWidth - ENEMY_WIDTH}px`;
-            enemyEl.style.top = `${pathTop + (pathHeight / 2) - (ENEMY_HEIGHT / 2)}px`;
             
+            const startPos = getPositionOnPath(0);
+            enemyEl.style.left = `${startPos.x - ENEMY_WIDTH/2}px`;
+            enemyEl.style.top = `${startPos.y - ENEMY_HEIGHT/2}px`;
+            
+            // Create eyeball structure
+            const eyeball = document.createElement('div');
+            eyeball.classList.add('enemy-eyeball');
+            const iris = document.createElement('div');
+            iris.classList.add('enemy-iris');
+            eyeball.appendChild(iris);
+            enemyEl.appendChild(eyeball);
+            
+            // Create health bar
             const healthBar = document.createElement('div');
             healthBar.classList.add('enemy-health-bar');
             const healthFill = document.createElement('div');
@@ -1083,68 +1756,54 @@
             enemies.push({
                 id: enemyIdCounter,
                 el: enemyEl,
-                x: gameWidth - ENEMY_WIDTH,
-                y: pathTop + (pathHeight / 2) - (ENEMY_HEIGHT / 2),
+                irisEl: iris,
+                x: startPos.x,
+                y: startPos.y,
                 health: ENEMY_HEALTH_MAX,
                 maxHealth: ENEMY_HEALTH_MAX,
                 speed: ENEMY_SPEED,
                 healthFillEl: healthFill,
                 age: 0,
                 width: ENEMY_WIDTH,
-                height: ENEMY_HEIGHT
+                height: ENEMY_HEIGHT,
+                pathProgress: 0  // Track progress along path (0 to 1)
             });
         }
         
+        // Update game UI
+        function updateUI() {
+            livesDisplay.textContent = lives;
+            scoreDisplay.textContent = score;
+            document.getElementById('money-display').textContent = money;
+        }
+        
+        // Lose a life
+        function loseLife() {
+            lives--;
+            updateUI();
+            
+            if (lives <= 0) {
+                alert('Game Over! Final Score: ' + score);
+                // Could restart game here
+                lives = 10; // Reset for now
+                score = 0;
+                updateUI();
+            }
+        }
+        
         function initialEnemyFill() {
-            if (pathHeight === 0 && pathTop === 0) return;
-            
-            const baseSpacing = ENEMY_WIDTH + 10;
-            const numToFill = Math.floor(gameWidth / baseSpacing);
-            let currentX = gameWidth - ENEMY_WIDTH;
-            
-            for (let i = 0; i < numToFill; i++) {
-                if (currentX + ENEMY_WIDTH < 0) break;
-                
-                // Add randomness to spacing (±5px) and Y position (±8px)
-                const spacingVariation = (Math.random() - 0.5) * 10; // ±5px
-                const yVariation = (Math.random() - 0.5) * 16; // ±8px
-                const xPos = currentX;
-                
-                enemyIdCounter++;
-                const enemyEl = document.createElement('div');
-                enemyEl.classList.add('enemy');
-                enemyEl.id = `enemy-${enemyIdCounter}`;
-                enemyEl.style.left = `${xPos}px`;
-                
-                const centerY = pathTop + (pathHeight / 2) - (ENEMY_HEIGHT / 2);
-                const finalY = Math.max(pathTop, Math.min(pathTop + pathHeight - ENEMY_HEIGHT, centerY + yVariation));
-                enemyEl.style.top = `${finalY}px`;
-                
-                const healthBar = document.createElement('div');
-                healthBar.classList.add('enemy-health-bar');
-                const healthFill = document.createElement('div');
-                healthFill.classList.add('enemy-health-fill');
-                healthBar.appendChild(healthFill);
-                enemyEl.appendChild(healthBar);
-                
-                gameContainer.appendChild(enemyEl);
-                
-                enemies.push({
-                    id: enemyIdCounter,
-                    el: enemyEl,
-                    x: xPos,
-                    y: finalY,
-                    health: ENEMY_HEALTH_MAX,
-                    maxHealth: ENEMY_HEALTH_MAX,
-                    speed: ENEMY_SPEED,
-                    healthFillEl: healthFill,
-                    age: 0,
-                    width: ENEMY_WIDTH,
-                    height: ENEMY_HEIGHT
-                });
-                
-                // Update position for next enemy with random spacing
-                currentX -= baseSpacing + spacingVariation;
+            // Start with a few enemies already on the path
+            for (let i = 0; i < 3; i++) {
+                spawnEnemy();
+                if (enemies.length > 0) {
+                    const enemy = enemies[enemies.length - 1];
+                    enemy.pathProgress = i * 0.2; // Space them out along the path
+                    const pos = getPositionOnPath(enemy.pathProgress);
+                    enemy.x = pos.x;
+                    enemy.y = pos.y;
+                    enemy.el.style.left = `${pos.x - ENEMY_WIDTH/2}px`;
+                    enemy.el.style.top = `${pos.y - ENEMY_HEIGHT/2}px`;
+                }
             }
         }
         
@@ -1160,25 +1819,127 @@
             
             for (let i = enemies.length - 1; i >= 0; i--) {
                 const enemy = enemies[i];
-                enemy.x -= enemy.speed * actualDeltaFactor;
                 enemy.age++;
-                enemy.el.style.left = `${enemy.x}px`;
                 
-                const healthPercentage = (enemy.health / enemy.maxHealth) * 100;
-                enemy.healthFillEl.style.width = `${Math.max(0, healthPercentage)}%`;
+                // Move along path
+                const pathLength = pathWaypoints.length - 1;
+                const moveDistance = enemy.speed * actualDeltaFactor;
+                const progressIncrement = moveDistance / (pathLength * 100); // Adjust speed as needed
                 
-                if (enemy.health <= 0) {
+                enemy.pathProgress += progressIncrement;
+                
+                if (enemy.pathProgress >= 1.0) {
+                    // Enemy reached the end - lose a life
+                    loseLife();
                     enemy.el.remove();
                     enemies.splice(i, 1);
                     continue;
                 }
                 
-                if (enemy.x + ENEMY_WIDTH < 0) {
+                // Update position based on path progress
+                const pos = getPositionOnPath(enemy.pathProgress);
+                enemy.x = pos.x;
+                enemy.y = pos.y;
+                enemy.el.style.left = `${pos.x - ENEMY_WIDTH/2}px`;
+                enemy.el.style.top = `${pos.y - ENEMY_HEIGHT/2}px`;
+                
+                const healthPercentage = (enemy.health / enemy.maxHealth) * 100;
+                enemy.healthFillEl.style.width = `${Math.max(0, healthPercentage)}%`;
+                
+                // Update iris tracking
+                updateEyeballIris(enemy);
+                
+                if (enemy.health <= 0) {
+                    // Create death explosion
+                    createEyeballDeathExplosion(enemy.x, enemy.y);
+                    
+                    // Enemy killed - gain score and money
+                    score += 10;
+                    money += 5;
+                    updateUI();
                     enemy.el.remove();
                     enemies.splice(i, 1);
+                    continue;
                 }
             }
         }
+        
+        // Eyeball iris tracking
+        let mouseX = 0, mouseY = 0;
+        
+        function updateEyeballIris(enemy) {
+            if (!enemy.irisEl) return;
+            
+            let targetX, targetY;
+            
+            // Try to track mouse cursor first
+            if (mouseX !== 0 || mouseY !== 0) {
+                targetX = mouseX;
+                targetY = mouseY;
+            } else {
+                // Fall back to closest turret
+                let closestTower = null;
+                let minDistance = Infinity;
+                
+                for (const tower of towers) {
+                    const distance = Math.sqrt(
+                        Math.pow(enemy.x - tower.x, 2) + 
+                        Math.pow(enemy.y - tower.y, 2)
+                    );
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                        closestTower = tower;
+                    }
+                }
+                
+                if (closestTower) {
+                    targetX = closestTower.x;
+                    targetY = closestTower.y;
+                } else {
+                    // Default to center if no target
+                    return;
+                }
+            }
+            
+            // Calculate angle from enemy to target
+            const dx = targetX - enemy.x;
+            const dy = targetY - enemy.y;
+            const angle = Math.atan2(dy, dx);
+            
+            // Move iris within eyeball bounds (max 6px from center)
+            const maxOffset = 6;
+            const irisX = Math.cos(angle) * maxOffset;
+            const irisY = Math.sin(angle) * maxOffset;
+            
+            enemy.irisEl.style.transform = `translate(${irisX}px, ${irisY}px)`;
+        }
+        
+        function createEyeballDeathExplosion(x, y) {
+            const explosion = document.createElement('div');
+            explosion.classList.add('visual-effect', 'eyeball-death-explosion');
+            explosion.style.left = `${x}px`;
+            explosion.style.top = `${y}px`;
+            
+            gameContainer.appendChild(explosion);
+            
+            // Play explosion sound
+            playSound('eyeball_death');
+            
+            setTimeout(() => explosion.remove(), 600);
+        }
+        
+        // Track mouse for iris targeting
+        document.addEventListener('mousemove', (e) => {
+            const rect = gameContainer.getBoundingClientRect();
+            mouseX = e.clientX - rect.left;
+            mouseY = e.clientY - rect.top;
+        });
+        
+        // Reset mouse tracking when cursor leaves game area
+        gameContainer.addEventListener('mouseleave', () => {
+            mouseX = 0;
+            mouseY = 0;
+        });
         
         // Tower targeting and firing
         function findTarget(tower) {
@@ -1186,8 +1947,9 @@
             let minDistance = tower.range;
             
             for (const enemy of enemies) {
-                const enemyCenterX = enemy.x + enemy.width / 2;
-                const enemyCenterY = enemy.y + enemy.height / 2;
+                // Target the center of the enemy
+                const enemyCenterX = enemy.x;
+                const enemyCenterY = enemy.y;
                 
                 const distance = Math.sqrt(
                     Math.pow(tower.x - enemyCenterX, 2) + 
@@ -1204,8 +1966,9 @@
         }
         
         function aimAt(tower, target) {
-            const targetX = target.x + target.width / 2;
-            const targetY = target.y + target.height / 2;
+            // Target the center of the enemy
+            const targetX = target.x;
+            const targetY = target.y;
             const angleToTargetRad = Math.atan2(targetY - tower.y, targetX - tower.x);
             
             tower.currentAngleRad = angleToTargetRad;
@@ -1550,6 +2313,20 @@
                 soundEnabled = soundToggle.checked;
             }
             
+            // Setup controls toggle
+            const controlsToggle = document.getElementById('controls-toggle');
+            const controls = document.getElementById('controls');
+            if (controlsToggle && controls) {
+                controlsToggle.addEventListener('click', () => {
+                    controls.classList.toggle('collapsed');
+                    const isCollapsed = controls.classList.contains('collapsed');
+                    controlsToggle.textContent = isCollapsed ? '▲ Show Controls ▲' : '▼ Hide Controls ▼';
+                });
+                // Start collapsed
+                controls.classList.add('collapsed');
+                controlsToggle.textContent = '▲ Show Controls ▲';
+            }
+            
             towers.forEach(tower => {
                 // Handle fireRate specially since HTML uses 'firerate' but object uses 'fireRate'
                 const fireRateSlider = document.getElementById(`${tower.type}-firerate`);
@@ -1593,9 +2370,11 @@
         
         // Initialize game
         document.addEventListener('DOMContentLoaded', () => {
-            updatePathPosition();
+            createPath();
             initializeTowers();
             setupControls();
+            setupTowerPalette();
+            updateUI();
             
             const userGestureEvents = ['click', 'touchstart', 'keydown', 'mousemove'];
             function handleUserGesture() {
