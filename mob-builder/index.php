@@ -166,6 +166,27 @@
         .control-group span { font-size: 0.8em; color: #555; }
         .global-controls { width: 100%; margin-bottom: 15px; padding: 10px; background-color: #d0d0d0; border-radius: 5px; text-align: center; }
         .global-controls label { margin: 0 10px; }
+        .damage-meter { 
+            margin-top: 10px; 
+            padding: 8px; 
+            background-color: #2c3e50; 
+            border-radius: 4px; 
+            color: #ecf0f1; 
+            text-align: center; 
+            border: 1px solid #34495e;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+        }
+        .damage-meter .damage-label { 
+            font-size: 0.7em; 
+            color: #bdc3c7; 
+            margin-bottom: 2px; 
+        }
+        .damage-meter .damage-value { 
+            font-size: 1.1em; 
+            font-weight: bold; 
+            color: #e74c3c; 
+            text-shadow: 0 0 3px rgba(231, 76, 60, 0.5);
+        }
     </style>
 </head>
 <body>
@@ -202,6 +223,10 @@
             <input type="range" id="rocket-projspeed" min="0.5" max="5" value="2" step="0.1">
             <label for="rocket-range">Range (px): <span id="rocket-range-val">400</span></label>
             <input type="range" id="rocket-range" min="50" max="600" value="400" step="10">
+            <div class="damage-meter" id="rocket-damage-meter">
+                <div class="damage-label">Total Damage</div>
+                <div class="damage-value">0</div>
+            </div>
         </div>
         <div class="control-group"  id="ice-controls">
             <h3>Ice Tower ❄️</h3>
@@ -213,6 +238,10 @@
             <input type="range" id="ice-projspeed" min="1" max="12" value="5" step="0.5">
             <label for="ice-range">Range (px): <span id="ice-range-val">400</span></label>
             <input type="range" id="ice-range" min="50" max="600" value="400" step="10">
+            <div class="damage-meter" id="ice-damage-meter">
+                <div class="damage-label">Total Damage</div>
+                <div class="damage-value">0</div>
+            </div>
         </div>
         <div class="control-group"  id="lightning-controls">
             <h3>Lightning Tower ⚡</h3>
@@ -222,6 +251,10 @@
             <input type="range" id="lightning-damage" min="10" max="150" value="35" step="5">
             <label for="lightning-range">Range (px): <span id="lightning-range-val">400</span></label>
             <input type="range" id="lightning-range" min="50" max="600" value="400" step="10">
+            <div class="damage-meter" id="lightning-damage-meter">
+                <div class="damage-label">Total Damage</div>
+                <div class="damage-value">0</div>
+            </div>
         </div>
     </div>
     <div id="bottom-pause-bar">
@@ -390,18 +423,25 @@
         }
 
         const towers = [ /* ... same ... */ 
-            { id: 'tower-rocket', baseEl: document.getElementById('tower-rocket-base'), pivotEl: document.querySelector('#tower-rocket-base .turret-pivot'), modelEl: document.querySelector('#tower-rocket-base .turret-model'), glowEl: document.querySelector('#tower-rocket-base .turret-glow-indicator'), type: 'rocket', barrelLength: 16, recoilClass: 'recoil-active', fireRate: 1500, damage: 70, projectileSpeed: 2, range: 400, lastShotTime: 0, currentAngleRad: DEFAULT_TURRET_ANGLE_RAD, chargeLevel: 0, projectileClass: 'rocket', initialChargeTime: 0 },
-            { id: 'tower-ice', baseEl: document.getElementById('tower-ice-base'), pivotEl: document.querySelector('#tower-ice-base .turret-pivot'), modelEl: document.querySelector('#tower-ice-base .turret-model'), glowEl: document.querySelector('#tower-ice-base .turret-glow-indicator'), type: 'ice', barrelLength: 15, recoilClass: 'recoil-active', fireRate: 900, damage: 20, projectileSpeed: 5, range: 400, lastShotTime: 0, currentAngleRad: DEFAULT_TURRET_ANGLE_RAD, chargeLevel: 0, projectileClass: 'ice-crystal-projectile', initialChargeTime: 0, splashRadius: ICE_SPLASH_RADIUS, splashDamageFactor: ICE_SPLASH_DAMAGE_PERCENTAGE },
-            { id: 'tower-lightning', baseEl: document.getElementById('tower-lightning-base'), pivotEl: document.querySelector('#tower-lightning-base .turret-pivot'), modelEl: document.querySelector('#tower-lightning-base .turret-lightning-barrel'), glowEl: document.querySelector('#tower-lightning-base .turret-glow-indicator'), type: 'lightning', barrelLength: 20, recoilClass: 'recoil-active', fireRate: 700, damage: 35, projectileSpeed: 0, range: 400, lastShotTime: 0, currentAngleRad: DEFAULT_TURRET_ANGLE_RAD, chargeLevel: 0, initialChargeTime: 0 }
+            { id: 'tower-rocket', baseEl: document.getElementById('tower-rocket-base'), pivotEl: document.querySelector('#tower-rocket-base .turret-pivot'), modelEl: document.querySelector('#tower-rocket-base .turret-model'), glowEl: document.querySelector('#tower-rocket-base .turret-glow-indicator'), type: 'rocket', barrelLength: 16, recoilClass: 'recoil-active', fireRate: 1500, damage: 70, projectileSpeed: 2, range: 400, lastShotTime: 0, currentAngleRad: DEFAULT_TURRET_ANGLE_RAD, chargeLevel: 0, projectileClass: 'rocket', initialChargeTime: 0, totalDamage: 0, damageEl: null },
+            { id: 'tower-ice', baseEl: document.getElementById('tower-ice-base'), pivotEl: document.querySelector('#tower-ice-base .turret-pivot'), modelEl: document.querySelector('#tower-ice-base .turret-model'), glowEl: document.querySelector('#tower-ice-base .turret-glow-indicator'), type: 'ice', barrelLength: 15, recoilClass: 'recoil-active', fireRate: 900, damage: 20, projectileSpeed: 5, range: 400, lastShotTime: 0, currentAngleRad: DEFAULT_TURRET_ANGLE_RAD, chargeLevel: 0, projectileClass: 'ice-crystal-projectile', initialChargeTime: 0, splashRadius: ICE_SPLASH_RADIUS, splashDamageFactor: ICE_SPLASH_DAMAGE_PERCENTAGE, totalDamage: 0, damageEl: null },
+            { id: 'tower-lightning', baseEl: document.getElementById('tower-lightning-base'), pivotEl: document.querySelector('#tower-lightning-base .turret-pivot'), modelEl: document.querySelector('#tower-lightning-base .turret-lightning-barrel'), glowEl: document.querySelector('#tower-lightning-base .turret-glow-indicator'), type: 'lightning', barrelLength: 20, recoilClass: 'recoil-active', fireRate: 700, damage: 35, projectileSpeed: 0, range: 400, lastShotTime: 0, currentAngleRad: DEFAULT_TURRET_ANGLE_RAD, chargeLevel: 0, initialChargeTime: 0, totalDamage: 0, damageEl: null }
         ];
         towers.forEach(tower => { /* ... same ... */ 
             tower.x = tower.baseEl.offsetLeft + tower.baseEl.offsetWidth / 2;
             tower.y = tower.baseEl.offsetTop + tower.baseEl.offsetHeight / 2;
             if (tower.pivotEl) tower.pivotEl.style.transform = `rotate(${tower.currentAngleRad - Math.PI/2}rad)`;
             if (tower.type === 'ice' && tower.baseEl) { for (let i=0; i < 5; i++) { const mote = document.createElement('div'); mote.classList.add('frost-mote'); mote.style.left = `${Math.random() * 80 - 40}%`; mote.style.top = `${Math.random() * 80 - 40}%`; mote.style.setProperty('--mote-dx', Math.random() * 20 - 10); mote.style.setProperty('--mote-dy', Math.random() * 20 - 10); mote.style.animationDelay = `${Math.random() * 4}s`; tower.baseEl.appendChild(mote);}}
+            tower.damageEl = document.querySelector(`#${tower.type}-damage-meter .damage-value`);
         });
 
         function updateSliderValue(sliderId, displayId) { /* ... same ... */ const slider = document.getElementById(sliderId); const display = document.getElementById(displayId); if (slider && display) { display.textContent = slider.value; return parseFloat(slider.value); } return 0; }
+        function updateTowerDamage(tower, damageDealt) {
+            tower.totalDamage += damageDealt;
+            if (tower.damageEl) {
+                tower.damageEl.textContent = Math.round(tower.totalDamage).toLocaleString();
+            }
+        }
         function setupControls() { /* ... same ... */ 
             const recoilMagSlider = document.getElementById('recoil-magnitude'); const recoilMagVal = document.getElementById('recoil-magnitude-val');
             if (recoilMagSlider && recoilMagVal) { recoilMagSlider.addEventListener('input', (e) => { globalRecoilMagnitude = parseFloat(e.target.value); recoilMagVal.textContent = e.target.value; }); globalRecoilMagnitude = parseFloat(recoilMagSlider.value); }
@@ -539,7 +579,7 @@
                     id: projectileIdCounter, el: projectileEl, 
                     x: startX, y: startY, 
                     damage: tower.damage, speed: tower.projectileSpeed, target: target, 
-                    towerType: tower.type, 
+                    towerType: tower.type, tower: tower,
                     currentAngle: (tower.type === 'rocket' ? tower.currentAngleRad : Math.atan2(target.y + ENEMY_HEIGHT/2 - startY, target.x + ENEMY_WIDTH/2 - startX)), 
                     age: 0, 
                     splashRadius: tower.splashRadius, splashDamageFactor: tower.splashDamageFactor 
@@ -563,7 +603,9 @@
                     if (tower.chargeLevel >= 1.0) {
                         if (tower.type === 'lightning') { 
                             try { 
+                                const actualDamage = Math.min(tower.damage, target.health);
                                 target.health -= tower.damage; 
+                                updateTowerDamage(tower, actualDamage);
                                 createLightningBoltVisual(tower, target); 
                                 playSound('lightning_fire'); 
                                 setTimeout(() => playSound('lightning_impact'), 50); 
@@ -609,11 +651,13 @@
                 }
 
                 if (distance < moveSpeed + (ENEMY_WIDTH / 3) ) { 
+                    const actualDamage = Math.min(proj.damage, targetEnemy.health);
                     targetEnemy.health -= proj.damage; 
+                    updateTowerDamage(proj.tower, actualDamage);
                     createVisualEffect(targetX, targetY, 'enemy_hit_sparkle');
                     let hitClass = '';
                     if (proj.towerType === 'rocket') { createVisualEffect(targetX, targetY, 'explosion'); playSound('rocket_impact'); hitClass = 'hit-rocket'; }
-                    else if (proj.towerType === 'ice') { createVisualEffect(targetX, targetY, 'ice_shatter'); playSound('ice_impact'); hitClass = 'hit-ice'; if (proj.splashRadius && proj.splashDamageFactor) { createVisualEffect(targetX, targetY, 'ice_splash', { radius: proj.splashRadius }); enemies.forEach(otherEnemy => { if (otherEnemy !== targetEnemy && otherEnemy.health > 0) { const splashDist = Math.sqrt(Math.pow(targetX - (otherEnemy.x + ENEMY_WIDTH/2), 2) + Math.pow(targetY - (otherEnemy.y + ENEMY_HEIGHT/2), 2)); if (splashDist <= proj.splashRadius) { otherEnemy.health -= proj.damage * proj.splashDamageFactor; if (otherEnemy.el) { otherEnemy.el.classList.add('hit-ice'); setTimeout(() => otherEnemy.el.classList.remove('hit-ice'), 100); createVisualEffect(otherEnemy.x + ENEMY_WIDTH/2, otherEnemy.y + ENEMY_HEIGHT/2, 'enemy_hit_sparkle'); } } } }); } }
+                    else if (proj.towerType === 'ice') { createVisualEffect(targetX, targetY, 'ice_shatter'); playSound('ice_impact'); hitClass = 'hit-ice'; if (proj.splashRadius && proj.splashDamageFactor) { createVisualEffect(targetX, targetY, 'ice_splash', { radius: proj.splashRadius }); enemies.forEach(otherEnemy => { if (otherEnemy !== targetEnemy && otherEnemy.health > 0) { const splashDist = Math.sqrt(Math.pow(targetX - (otherEnemy.x + ENEMY_WIDTH/2), 2) + Math.pow(targetY - (otherEnemy.y + ENEMY_HEIGHT/2), 2)); if (splashDist <= proj.splashRadius) { const splashDamage = proj.damage * proj.splashDamageFactor; const actualSplashDamage = Math.min(splashDamage, otherEnemy.health); otherEnemy.health -= splashDamage; updateTowerDamage(proj.tower, actualSplashDamage); if (otherEnemy.el) { otherEnemy.el.classList.add('hit-ice'); setTimeout(() => otherEnemy.el.classList.remove('hit-ice'), 100); createVisualEffect(otherEnemy.x + ENEMY_WIDTH/2, otherEnemy.y + ENEMY_HEIGHT/2, 'enemy_hit_sparkle'); } } } }); } }
                     if (targetEnemy.el && hitClass) { targetEnemy.el.classList.add(hitClass); setTimeout(() => targetEnemy.el.classList.remove(hitClass), 100); }
                     proj.el.remove(); projectiles.splice(i, 1); continue;
                 }
