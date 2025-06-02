@@ -91,6 +91,26 @@
             display: flex; align-items: center; justify-content: center; 
             box-shadow: 0 3px 6px rgba(0,0,0,0.4), inset 0 2px 4px rgba(0,0,0,0.2); 
             top: 50px; 
+            cursor: grab;
+            user-select: none;
+            transition: transform 0.1s ease;
+        }
+        
+        .tower-base:hover {
+            transform: scale(1.05);
+        }
+        
+        .tower-base.dragging {
+            cursor: grabbing;
+            z-index: 1000;
+            transform: scale(1.1);
+            opacity: 0.8;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.6), inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .tower-base.disabled {
+            opacity: 0.6;
+            filter: grayscale(0.3);
         }
         
         #tower-rocket-base { 
@@ -425,13 +445,6 @@
     </div>
     
     <div id="controls">
-        <div class="global-controls">
-            <h3>Global Recoil Settings</h3>
-            <label for="recoil-magnitude">Magnitude (px): <span id="recoil-magnitude-val">10</span></label>
-            <input type="range" id="recoil-magnitude" min="0" max="20" value="10" step="1">
-            <label for="recoil-duration">Duration (ms): <span id="recoil-duration-val">150</span></label>
-            <input type="range" id="recoil-duration" min="50" max="500" value="150" step="10">
-        </div>
         
         <div class="control-group" id="rocket-controls">
             <h3>Rocket Tower 🚀</h3>
@@ -492,6 +505,9 @@
     
     <div id="bottom-pause-bar">
         <button id="pause-button-bottom" class="pause-button-style">Pause</button>
+        <label for="sound-toggle" style="margin-left: 20px; color: #333;">
+            <input type="checkbox" id="sound-toggle" checked> Sound Effects
+        </label>
     </div>
 
     <script>
@@ -525,6 +541,17 @@
         let isPaused = false;
         let animationFrameId;
         let lastTimestamp = 0;
+        let soundEnabled = true;
+        
+        // Drag and drop state
+        let dragState = {
+            isDragging: false,
+            draggedTower: null,
+            startX: 0,
+            startY: 0,
+            offsetX: 0,
+            offsetY: 0
+        };
         
         // Simple tower system
         const towers = [
@@ -534,7 +561,8 @@
                 baseEl: null, pivotEl: null, modelEl: null, glowEl: null, damageEl: null,
                 x: 0, y: 0,
                 fireRate: 1500, damage: 70, range: 400, barrelLength: 16,
-                lastShotTime: 0, currentAngleRad: -Math.PI / 2, chargeLevel: 0, totalDamage: 0
+                lastShotTime: 0, currentAngleRad: -Math.PI / 2, chargeLevel: 0, totalDamage: 0,
+                disabled: false
             },
             { 
                 id: 'tower-ice', 
@@ -543,7 +571,7 @@
                 x: 0, y: 0,
                 fireRate: 900, damage: 20, range: 400, barrelLength: 15,
                 lastShotTime: 0, currentAngleRad: -Math.PI / 2, chargeLevel: 0, totalDamage: 0,
-                splashRadius: 70, splashDamageFactor: 0.5
+                splashRadius: 70, splashDamageFactor: 0.5, disabled: false
             },
             { 
                 id: 'tower-lightning', 
@@ -551,7 +579,8 @@
                 baseEl: null, pivotEl: null, modelEl: null, glowEl: null, damageEl: null,
                 x: 0, y: 0,
                 fireRate: 700, damage: 35, range: 400, barrelLength: 20,
-                lastShotTime: 0, currentAngleRad: -Math.PI / 2, chargeLevel: 0, totalDamage: 0
+                lastShotTime: 0, currentAngleRad: -Math.PI / 2, chargeLevel: 0, totalDamage: 0,
+                disabled: false
             },
             { 
                 id: 'tower-machinegun', 
@@ -559,7 +588,8 @@
                 baseEl: null, pivotEl: null, modelEl: null, glowEl: null, damageEl: null,
                 x: 0, y: 0,
                 fireRate: 200, damage: 8, range: 350, barrelLength: 18,
-                lastShotTime: 0, currentAngleRad: -Math.PI / 2, chargeLevel: 0, totalDamage: 0
+                lastShotTime: 0, currentAngleRad: -Math.PI / 2, chargeLevel: 0, totalDamage: 0,
+                disabled: false
             }
         ];
         
@@ -580,6 +610,11 @@
                 if (tower.pivotEl) {
                     tower.pivotEl.style.transform = `rotate(${tower.currentAngleRad - Math.PI/2}rad)`;
                 }
+                
+                // Add drag and drop event handlers
+                if (tower.baseEl) {
+                    setupDragAndDrop(tower);
+                }
             });
         }
         
@@ -589,6 +624,83 @@
             if (tower.damageEl) {
                 tower.damageEl.textContent = Math.round(tower.totalDamage).toLocaleString();
             }
+        }
+        
+        // Drag and drop functionality
+        function setupDragAndDrop(tower) {
+            tower.baseEl.addEventListener('mousedown', (e) => startDrag(e, tower));
+            tower.baseEl.addEventListener('touchstart', (e) => startDrag(e, tower), { passive: false });
+        }
+        
+        function startDrag(e, tower) {
+            e.preventDefault();
+            
+            dragState.isDragging = true;
+            dragState.draggedTower = tower;
+            
+            const rect = gameContainer.getBoundingClientRect();
+            const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
+            
+            dragState.offsetX = clientX - rect.left - tower.baseEl.offsetLeft;
+            dragState.offsetY = clientY - rect.top - tower.baseEl.offsetTop;
+            
+            // Disable tower and add visual feedback
+            tower.disabled = true;
+            tower.baseEl.classList.add('dragging');
+            tower.baseEl.classList.add('disabled');
+            
+            // Add global event listeners
+            document.addEventListener('mousemove', dragMove);
+            document.addEventListener('touchmove', dragMove, { passive: false });
+            document.addEventListener('mouseup', dragEnd);
+            document.addEventListener('touchend', dragEnd);
+        }
+        
+        function dragMove(e) {
+            if (!dragState.isDragging || !dragState.draggedTower) return;
+            
+            e.preventDefault();
+            
+            const rect = gameContainer.getBoundingClientRect();
+            const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
+            
+            let newX = clientX - rect.left - dragState.offsetX;
+            let newY = clientY - rect.top - dragState.offsetY;
+            
+            // Constrain to game container bounds
+            const towerSize = 45;
+            newX = Math.max(0, Math.min(gameContainer.offsetWidth - towerSize, newX));
+            newY = Math.max(0, Math.min(gameContainer.offsetHeight - towerSize, newY));
+            
+            dragState.draggedTower.baseEl.style.left = `${newX}px`;
+            dragState.draggedTower.baseEl.style.top = `${newY}px`;
+        }
+        
+        function dragEnd(e) {
+            if (!dragState.isDragging || !dragState.draggedTower) return;
+            
+            const tower = dragState.draggedTower;
+            
+            // Update tower position
+            tower.x = tower.baseEl.offsetLeft + tower.baseEl.offsetWidth / 2;
+            tower.y = tower.baseEl.offsetTop + tower.baseEl.offsetHeight / 2;
+            
+            // Re-enable tower and remove visual feedback
+            tower.disabled = false;
+            tower.baseEl.classList.remove('dragging');
+            tower.baseEl.classList.remove('disabled');
+            
+            // Reset drag state
+            dragState.isDragging = false;
+            dragState.draggedTower = null;
+            
+            // Remove global event listeners
+            document.removeEventListener('mousemove', dragMove);
+            document.removeEventListener('touchmove', dragMove);
+            document.removeEventListener('mouseup', dragEnd);
+            document.removeEventListener('touchend', dragEnd);
         }
         
         // Audio system
@@ -611,7 +723,7 @@
         }
         
         function playSound(type) {
-            if (!ensureAudioContext()) return;
+            if (!soundEnabled || !ensureAudioContext()) return;
             
             if (!audioCtx) return;
             let osc, gain, dur, freq, noiseSource, buffer, output, filter;
@@ -1379,6 +1491,8 @@
             if (isPaused) return;
             
             towers.forEach(tower => {
+                // Skip disabled towers (being dragged)
+                if (tower.disabled) return;
                 // Update charge level
                 if (tower.fireRate > 0) {
                     if (tower.lastShotTime > 0) {
@@ -1428,28 +1542,28 @@
         
         // Control system
         function setupControls() {
-            const recoilMagSlider = document.getElementById('recoil-magnitude');
-            const recoilMagVal = document.getElementById('recoil-magnitude-val');
-            if (recoilMagSlider && recoilMagVal) {
-                recoilMagSlider.addEventListener('input', (e) => {
-                    globalRecoilMagnitude = parseFloat(e.target.value);
-                    recoilMagVal.textContent = e.target.value;
+            const soundToggle = document.getElementById('sound-toggle');
+            if (soundToggle) {
+                soundToggle.addEventListener('change', (e) => {
+                    soundEnabled = e.target.checked;
                 });
-                globalRecoilMagnitude = parseFloat(recoilMagSlider.value);
-            }
-            
-            const recoilDurSlider = document.getElementById('recoil-duration');
-            const recoilDurVal = document.getElementById('recoil-duration-val');
-            if (recoilDurSlider && recoilDurVal) {
-                recoilDurSlider.addEventListener('input', (e) => {
-                    globalRecoilDuration = parseFloat(e.target.value);
-                    recoilDurVal.textContent = e.target.value;
-                });
-                globalRecoilDuration = parseFloat(recoilDurSlider.value);
+                soundEnabled = soundToggle.checked;
             }
             
             towers.forEach(tower => {
-                ['firerate', 'damage', 'range'].forEach(stat => {
+                // Handle fireRate specially since HTML uses 'firerate' but object uses 'fireRate'
+                const fireRateSlider = document.getElementById(`${tower.type}-firerate`);
+                const fireRateDisplay = document.getElementById(`${tower.type}-firerate-val`);
+                if (fireRateSlider && fireRateDisplay) {
+                    fireRateSlider.addEventListener('input', () => {
+                        tower.fireRate = parseFloat(fireRateSlider.value);
+                        fireRateDisplay.textContent = fireRateSlider.value;
+                    });
+                    tower.fireRate = parseFloat(fireRateSlider.value);
+                }
+                
+                // Handle other stats
+                ['damage', 'range'].forEach(stat => {
                     const slider = document.getElementById(`${tower.type}-${stat}`);
                     const valDisplay = document.getElementById(`${tower.type}-${stat}-val`);
                     

@@ -207,11 +207,14 @@
     <div id="controls">
         <!-- Controls remain the same -->
         <div class="global-controls">
-            <h3>Global Recoil Settings</h3>
-            <label for="recoil-magnitude">Magnitude (px): <span id="recoil-magnitude-val">10</span></label>
+            <h3>Global Settings</h3>
+            <label for="recoil-magnitude">Recoil Magnitude (px): <span id="recoil-magnitude-val">10</span></label>
             <input type="range" id="recoil-magnitude" min="0" max="20" value="10" step="1">
-            <label for="recoil-duration">Duration (ms): <span id="recoil-duration-val">150</span></label>
+            <label for="recoil-duration">Recoil Duration (ms): <span id="recoil-duration-val">150</span></label>
             <input type="range" id="recoil-duration" min="50" max="500" value="150" step="10">
+            <label for="sound-toggle">
+                <input type="checkbox" id="sound-toggle" checked> Sound Effects
+            </label>
         </div>
         <div class="control-group" id="rocket-controls">
             <h3>Rocket Tower 🚀</h3>
@@ -285,6 +288,7 @@
 
         let audioCtx = null; let userHasInteracted = false;
         let isPaused = false; let animationFrameId; let lastTimestamp = 0;
+        let soundEnabled = true;
 
         const ICE_SPLASH_RADIUS = 70;
         const ICE_SPLASH_DAMAGE_PERCENTAGE = 0.5;
@@ -302,7 +306,7 @@
             }
             return audioCtx.state === 'running';
         }
-        function playSound(type) { if (!ensureAudioContext()) return; actuallyPlaySound(type); }
+        function playSound(type) { if (!soundEnabled || !ensureAudioContext()) return; actuallyPlaySound(type); }
         function actuallyPlaySound(type) { /* ... same ... */ 
             if (!audioCtx) return;
             let osc, gain, dur, freq, attack, decay, noiseSource, buffer, output, filter, env;
@@ -447,6 +451,8 @@
             if (recoilMagSlider && recoilMagVal) { recoilMagSlider.addEventListener('input', (e) => { globalRecoilMagnitude = parseFloat(e.target.value); recoilMagVal.textContent = e.target.value; }); globalRecoilMagnitude = parseFloat(recoilMagSlider.value); }
             const recoilDurSlider = document.getElementById('recoil-duration'); const recoilDurVal = document.getElementById('recoil-duration-val');
             if (recoilDurSlider && recoilDurVal) { recoilDurSlider.addEventListener('input', (e) => { globalRecoilDuration = parseFloat(e.target.value); recoilDurVal.textContent = e.target.value; }); globalRecoilDuration = parseFloat(recoilDurSlider.value); }
+            const soundToggle = document.getElementById('sound-toggle');
+            if (soundToggle) { soundToggle.addEventListener('change', (e) => { soundEnabled = e.target.checked; }); soundEnabled = soundToggle.checked; }
             towers.forEach(tower => { const type = tower.type;
                 ['firerate', 'damage', 'range'].forEach(stat => {
                     const slider = document.getElementById(`${type}-${stat}`); const valDisplay = document.getElementById(`${type}-${stat}-val`);
