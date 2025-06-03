@@ -8,20 +8,6 @@
         body { 
             font-family: sans-serif; display: flex; flex-direction: column; 
             align-items: center; margin: 0; background-color: #e0e0e0; 
-            padding-bottom: 70px; 
-        }
-        .pause-button-style { 
-            padding: 10px 20px; font-size: 16px; cursor: pointer; 
-            background-color: #4CAF50; color: white; border: none; 
-            border-radius: 5px; margin: 0 5px; 
-        }
-        .pause-button-style.paused { background-color: #f44336; }
-        
-        #bottom-pause-bar { 
-            position: fixed; bottom: 0; left: 0; width: 100%; 
-            background-color: rgba(200, 200, 200, 0.9); padding: 10px 0; 
-            display: flex; justify-content: center; z-index: 200; 
-            box-shadow: 0 -2px 5px rgba(0,0,0,0.2); 
         }
 
         #game-container { 
@@ -282,59 +268,59 @@
             font-weight: bold;
         }
         
+        #pause-button, #music-toggle, #sound-toggle-ui {
+            background: none;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 4px 6px;
+            border-radius: 4px;
+            margin: 2px;
+            transition: all 0.2s ease;
+        }
+        
+        #pause-button {
+            background-color: #4CAF50;
+        }
+        
+        #pause-button:hover, #music-toggle:hover, #sound-toggle-ui:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.6);
+        }
+        
+        #pause-button:hover {
+            opacity: 0.8;
+        }
+        
+        #music-toggle.muted, #sound-toggle-ui.muted {
+            opacity: 0.5;
+            text-decoration: line-through;
+        }
+        
         #tower-palette {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background-color: rgba(0, 0, 0, 0.9);
-            padding: 10px;
-            border-radius: 8px;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            padding: 15px;
             display: flex;
-            flex-direction: column;
-            gap: 10px;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
             z-index: 200;
-            border: 2px solid #444;
-            transition: all 0.3s ease;
-        }
-        
-        #tower-palette.collapsed {
-            padding: 5px 10px;
-        }
-        
-        #tower-palette.collapsed .tower-icon {
-            display: none;
+            border-top: 3px solid #444;
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.3);
         }
         
         #tower-palette-header {
             color: white;
-            font-size: 12px;
-            margin-bottom: 5px;
+            font-size: 14px;
             font-weight: bold;
             user-select: none;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        #tower-palette-title {
-            cursor: move;
-            flex-grow: 1;
-            text-align: center;
-        }
-        
-        #tower-palette-collapse {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 14px;
-            cursor: pointer;
-            padding: 2px 4px;
-            border-radius: 3px;
-            transition: background-color 0.2s;
-        }
-        
-        #tower-palette-collapse:hover {
-            background-color: rgba(255, 255, 255, 0.2);
+            margin-right: 30px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
         }
         
         /* Game Over Modal */
@@ -410,36 +396,36 @@
         }
         
         .tower-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 8px;
+            width: 80px !important;
+            height: 80px !important;
+            border-radius: 10px;
             cursor: grab;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
-            border: 2px solid #666;
+            font-size: 32px;
+            border: 3px solid #666;
             transition: all 0.2s ease;
             position: relative;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
         }
         
         .tower-icon:hover {
-            transform: scale(1.1);
+            transform: translateY(-3px);
             border-color: #fff;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
         }
         
         .tower-icon.dragging {
             cursor: grabbing;
-            opacity: 0.7;
+            opacity: 0.8;
+            transform: rotate(5deg);
         }
         
         .tower-icon.rocket {
-            width: 50px;
-            height: 50px;
             background: linear-gradient(135deg, #A0522D 0%, #8B4513 100%);
             color: #FFE4B5;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
-            font-size: 22px;
         }
         
         .tower-icon.ice {
@@ -901,13 +887,15 @@
             <div>Lives: <span id="lives-display">10</span></div>
             <div>Score: <span id="score-display">0</span></div>
             <div>Money: $<span id="money-display">500</span></div>
+            <div>
+                <button id="pause-button" title="Pause/Resume game">⏸️</button>
+                <button id="music-toggle" title="Toggle background music">🎵</button>
+                <button id="sound-toggle-ui" title="Toggle sound effects">🔊</button>
+            </div>
         </div>
         
         <div id="tower-palette">
-            <div id="tower-palette-header">
-                <div id="tower-palette-title">TOWERS</div>
-                <button id="tower-palette-collapse">▼</button>
-            </div>
+            <div id="tower-palette-header">TOWERS</div>
             <div class="tower-icon rocket" data-tower-type="rocket">
                 🚀
                 <div class="tower-cost">$100</div>
@@ -988,18 +976,12 @@
         </div>
     </div>
     
-    <div id="bottom-pause-bar">
-        <button id="pause-button-bottom" class="pause-button-style">Pause</button>
-        <label for="sound-toggle" style="margin-left: 20px; color: #333;">
-            <input type="checkbox" id="sound-toggle" checked> Sound Effects
-        </label>
-    </div>
 
     <script>
         // Simple standalone tower defense system
         const gameContainer = document.getElementById('game-container');
         const pathContainer = document.getElementById('path-container');
-        const pauseButtonBottom = document.getElementById('pause-button-bottom');
+        const pauseButton = document.getElementById('pause-button');
         const livesDisplay = document.getElementById('lives-display');
         const scoreDisplay = document.getElementById('score-display');
         
@@ -1049,6 +1031,14 @@
         let animationFrameId;
         let lastTimestamp = 0;
         let soundEnabled = true;
+        let musicEnabled = true;
+        let backgroundMusic = {
+            playing: false,
+            oscillators: [],
+            gainNodes: [],
+            sequence: 0,
+            tempo: 180 // BPM - Much faster and more energetic
+        };
         
         // Drag and drop state
         let dragState = {
@@ -1067,12 +1057,6 @@
             previewTower: null
         };
         
-        // Palette drag state
-        let paletteState = {
-            isDragging: false,
-            offsetX: 0,
-            offsetY: 0
-        };
         
         // Path system - complex winding path
         const pathWaypoints = [
@@ -1187,96 +1171,17 @@
             return tower;
         }
         
-        // Setup tower palette drag functionality
+        // Setup tower palette functionality
         function setupTowerPalette() {
             const towerIcons = document.querySelectorAll('.tower-icon');
-            const palette = document.getElementById('tower-palette');
-            const paletteHeader = document.getElementById('tower-palette-header');
             
             // Setup tower placement from icons
             towerIcons.forEach(icon => {
                 icon.addEventListener('mousedown', (e) => startTowerPlacement(e, icon));
                 icon.addEventListener('touchstart', (e) => startTowerPlacement(e, icon), { passive: false });
             });
-            
-            // Setup palette dragging - now only on title
-            const paletteTitle = document.getElementById('tower-palette-title');
-            const paletteCollapseBtn = document.getElementById('tower-palette-collapse');
-            
-            paletteTitle.addEventListener('mousedown', (e) => startPaletteDrag(e));
-            paletteTitle.addEventListener('touchstart', (e) => startPaletteDrag(e), { passive: false });
-            
-            // Setup collapse functionality
-            paletteCollapseBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                togglePaletteCollapse();
-            });
         }
         
-        function togglePaletteCollapse() {
-            const palette = document.getElementById('tower-palette');
-            const collapseBtn = document.getElementById('tower-palette-collapse');
-            
-            palette.classList.toggle('collapsed');
-            
-            if (palette.classList.contains('collapsed')) {
-                collapseBtn.textContent = '▶';
-            } else {
-                collapseBtn.textContent = '▼';
-            }
-        }
-        
-        function startPaletteDrag(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            const palette = document.getElementById('tower-palette');
-            const rect = palette.getBoundingClientRect();
-            const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
-            const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
-            
-            paletteState.isDragging = true;
-            paletteState.offsetX = clientX - rect.left;
-            paletteState.offsetY = clientY - rect.top;
-            
-            document.addEventListener('mousemove', paletteDragMove);
-            document.addEventListener('touchmove', paletteDragMove, { passive: false });
-            document.addEventListener('mouseup', paletteDragEnd);
-            document.addEventListener('touchend', paletteDragEnd);
-        }
-        
-        function paletteDragMove(e) {
-            if (!paletteState.isDragging) return;
-            
-            e.preventDefault();
-            
-            const palette = document.getElementById('tower-palette');
-            const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
-            const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
-            
-            let newX = clientX - paletteState.offsetX;
-            let newY = clientY - paletteState.offsetY;
-            
-            // Keep palette within window bounds
-            newX = Math.max(0, Math.min(window.innerWidth - palette.offsetWidth, newX));
-            newY = Math.max(0, Math.min(window.innerHeight - palette.offsetHeight, newY));
-            
-            palette.style.left = `${newX}px`;
-            palette.style.top = `${newY}px`;
-            palette.style.right = 'auto'; // Remove right positioning
-        }
-        
-        function paletteDragEnd() {
-            if (!paletteState.isDragging) return;
-            
-            paletteState.isDragging = false;
-            
-            document.removeEventListener('mousemove', paletteDragMove);
-            document.removeEventListener('touchmove', paletteDragMove);
-            document.removeEventListener('mouseup', paletteDragEnd);
-            document.removeEventListener('touchend', paletteDragEnd);
-        }
         
         function startTowerPlacement(e, icon) {
             e.preventDefault();
@@ -1984,6 +1889,164 @@
                         debrisOsc.stop(now + k * 0.05 + 0.4);
                     }
                     break;
+            }
+        }
+        
+        // 8-bit Background Music System
+        function startBackgroundMusic() {
+            if (!musicEnabled || !ensureAudioContext() || backgroundMusic.playing) return;
+            
+            backgroundMusic.playing = true;
+            backgroundMusic.sequence = 0;
+            playMusicSequence();
+        }
+        
+        function stopBackgroundMusic() {
+            backgroundMusic.playing = false;
+            backgroundMusic.oscillators.forEach(osc => {
+                try { osc.stop(); } catch (e) {}
+            });
+            backgroundMusic.gainNodes.forEach(gain => {
+                try { gain.disconnect(); } catch (e) {}
+            });
+            backgroundMusic.oscillators = [];
+            backgroundMusic.gainNodes = [];
+        }
+        
+        function playMusicSequence() {
+            if (!backgroundMusic.playing || !audioCtx) return;
+            
+            const now = audioCtx.currentTime;
+            const beatDuration = 60 / backgroundMusic.tempo; // Duration of one beat
+            
+            // 8-bit adventure melody - Energetic and heroic!
+            const melodySequence = [
+                // Heroic opening (4 bars) - Fast ascending runs
+                [523, 659, 784, 1047, 784, 659, 784, 1047], // C E G C G E G C
+                [1175, 1047, 880, 784, 880, 1047, 1175, 1319], // D C A G A C D E
+                [1319, 1175, 1047, 880, 1047, 880, 784, 659], // E D C A C A G E
+                [784, 880, 1047, 1319, 1047, 784, 659, 523], // G A C E C G E C
+                
+                // Adventure bridge (4 bars) - Staccato jumps
+                [880, 0, 1047, 0, 1319, 0, 1568, 0],       // A - C - E - G -
+                [1568, 1319, 1175, 1047, 880, 784, 659, 587], // G E D C A G E D
+                [659, 784, 880, 1047, 1175, 1319, 1568, 1760], // E G A C D E G A
+                [1760, 1568, 1319, 1047, 784, 659, 523, 440], // A G E C G E C A
+                
+                // Victory theme (4 bars) - Triumphant arpeggios
+                [523, 659, 784, 1047, 523, 659, 784, 1047], // C E G C C E G C
+                [587, 740, 880, 1175, 587, 740, 880, 1175], // D F♯ A D D F♯ A D
+                [523, 659, 784, 1047, 1319, 1047, 784, 659], // C E G C E C G E
+                [523, 784, 1047, 1319, 1047, 784, 523, 0]   // C G C E C G C -
+            ];
+            
+            // Driving bass line - Pulsing eighth notes
+            const bassSequence = [
+                [131, 131, 196, 196, 131, 131, 196, 196], // C C G G C C G G
+                [147, 147, 220, 220, 147, 147, 220, 220], // D D A A D D A A
+                [165, 165, 247, 247, 165, 165, 247, 247], // E E B B E E B B
+                [131, 131, 196, 196, 131, 196, 131, 196], // C C G G C G C G
+                
+                [110, 110, 165, 165, 110, 110, 165, 165], // A A E E A A E E
+                [123, 123, 185, 185, 123, 123, 185, 185], // B B F♯ F♯ B B F♯ F♯
+                [131, 131, 196, 196, 131, 131, 196, 196], // C C G G C C G G
+                [147, 147, 220, 220, 147, 220, 147, 220], // D D A A D A D A
+                
+                [131, 196, 131, 196, 131, 196, 131, 196], // C G C G C G C G
+                [147, 220, 147, 220, 147, 220, 147, 220], // D A D A D A D A
+                [131, 196, 131, 196, 165, 196, 165, 196], // C G C G E G E G
+                [131, 196, 131, 196, 131, 196, 131, 0]    // C G C G C G C -
+            ];
+            
+            const currentBar = Math.floor(backgroundMusic.sequence / 8) % melodySequence.length;
+            const currentBeat = backgroundMusic.sequence % 8;
+            
+            const melodyFreq = melodySequence[currentBar][currentBeat];
+            const bassFreq = bassSequence[currentBar][currentBeat];
+            
+            // Play melody
+            if (melodyFreq > 0) {
+                const melodyOsc = audioCtx.createOscillator();
+                const melodyGain = audioCtx.createGain();
+                
+                melodyOsc.type = 'square'; // 8-bit square wave
+                melodyOsc.frequency.setValueAtTime(melodyFreq, now);
+                
+                melodyGain.gain.setValueAtTime(0, now);
+                melodyGain.gain.linearRampToValueAtTime(0.12, now + 0.005); // Punchier attack
+                melodyGain.gain.exponentialRampToValueAtTime(0.08, now + beatDuration * 0.3); // Hold longer
+                melodyGain.gain.exponentialRampToValueAtTime(0.01, now + beatDuration * 0.9); // Quick release
+                melodyGain.gain.linearRampToValueAtTime(0, now + beatDuration);
+                
+                melodyOsc.connect(melodyGain);
+                melodyGain.connect(audioCtx.destination);
+                
+                melodyOsc.start(now);
+                melodyOsc.stop(now + beatDuration);
+                
+                backgroundMusic.oscillators.push(melodyOsc);
+                backgroundMusic.gainNodes.push(melodyGain);
+            }
+            
+            // Play bass
+            if (bassFreq > 0) {
+                const bassOsc = audioCtx.createOscillator();
+                const bassGain = audioCtx.createGain();
+                
+                bassOsc.type = 'triangle'; // Softer bass
+                bassOsc.frequency.setValueAtTime(bassFreq, now);
+                
+                bassGain.gain.setValueAtTime(0, now);
+                bassGain.gain.linearRampToValueAtTime(0.10, now + 0.005); // Punchier bass
+                bassGain.gain.exponentialRampToValueAtTime(0.06, now + beatDuration * 0.4); // Sustain
+                bassGain.gain.exponentialRampToValueAtTime(0.01, now + beatDuration * 0.85);
+                bassGain.gain.linearRampToValueAtTime(0, now + beatDuration);
+                
+                bassOsc.connect(bassGain);
+                bassGain.connect(audioCtx.destination);
+                
+                bassOsc.start(now);
+                bassOsc.stop(now + beatDuration);
+                
+                backgroundMusic.oscillators.push(bassOsc);
+                backgroundMusic.gainNodes.push(bassGain);
+            }
+            
+            backgroundMusic.sequence++;
+            
+            // Schedule next beat
+            if (backgroundMusic.playing) {
+                setTimeout(() => playMusicSequence(), beatDuration * 1000);
+            }
+        }
+        
+        function toggleMusic() {
+            const musicBtn = document.getElementById('music-toggle');
+            
+            if (musicEnabled) {
+                musicEnabled = false;
+                stopBackgroundMusic();
+                musicBtn.classList.add('muted');
+                musicBtn.textContent = '🔇';
+            } else {
+                musicEnabled = true;
+                startBackgroundMusic();
+                musicBtn.classList.remove('muted');
+                musicBtn.textContent = '🎵';
+            }
+        }
+        
+        function toggleSoundEffects() {
+            const soundBtn = document.getElementById('sound-toggle-ui');
+            
+            if (soundEnabled) {
+                soundEnabled = false;
+                soundBtn.classList.add('muted');
+                soundBtn.textContent = '🔇';
+            } else {
+                soundEnabled = true;
+                soundBtn.classList.remove('muted');
+                soundBtn.textContent = '🔊';
             }
         }
         
@@ -2821,10 +2884,10 @@
         
         function togglePauseState() {
             isPaused = !isPaused;
-            const buttonText = isPaused ? 'Resume' : 'Pause';
-            if (pauseButtonBottom) {
-                pauseButtonBottom.textContent = buttonText;
-                pauseButtonBottom.classList.toggle('paused', isPaused);
+            const buttonIcon = isPaused ? '▶️' : '⏸️';
+            if (pauseButton) {
+                pauseButton.textContent = buttonIcon;
+                pauseButton.style.backgroundColor = isPaused ? '#f44336' : '#4CAF50';
             }
             if (!isPaused) {
                 lastTimestamp = performance.now();
@@ -2860,9 +2923,28 @@
             animationFrameId = requestAnimationFrame(gameLoop);
         });
         
-        if (pauseButtonBottom) {
-            pauseButtonBottom.addEventListener('click', togglePauseState);
+        if (pauseButton) {
+            pauseButton.addEventListener('click', togglePauseState);
         }
+        
+        // Setup music and sound toggle buttons
+        const musicToggle = document.getElementById('music-toggle');
+        const soundToggleUI = document.getElementById('sound-toggle-ui');
+        
+        if (musicToggle) {
+            musicToggle.addEventListener('click', toggleMusic);
+        }
+        
+        if (soundToggleUI) {
+            soundToggleUI.addEventListener('click', toggleSoundEffects);
+        }
+        
+        // Start background music once user interacts
+        document.addEventListener('click', () => {
+            if (musicEnabled && !backgroundMusic.playing) {
+                startBackgroundMusic();
+            }
+        }, { once: true });
     </script>
     
     <!-- Game Over Modal -->
