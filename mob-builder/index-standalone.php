@@ -32,6 +32,98 @@
             z-index: 10;
         }
 
+        .flower {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            z-index: 1;
+            animation: sway 3s ease-in-out infinite;
+        }
+        .flower::before {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            top: 0;
+            left: 2px;
+        }
+        .flower::after {
+            content: '';
+            position: absolute;
+            width: 2px;
+            height: 8px;
+            background-color: #4a7c2a;
+            bottom: 0;
+            left: 5px;
+        }
+        .flower.yellow::before { background-color: #f4e157; }
+        .flower.pink::before { background-color: #e57373; }
+        .flower.purple::before { background-color: #b39ddb; }
+        .flower.white::before { background-color: #f8f8f8; }
+
+        .bunny {
+            position: absolute;
+            width: 16px;
+            height: 20px;
+            z-index: 2;
+            animation: hop 4s ease-in-out infinite;
+        }
+        .bunny::before {
+            content: '';
+            position: absolute;
+            width: 14px;
+            height: 10px;
+            background-color: #f5f5f5;
+            border-radius: 60% 40% 60% 40%;
+            bottom: 2px;
+            left: 1px;
+            border: 1px solid #e0e0e0;
+        }
+        .bunny::after {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background-color: #f5f5f5;
+            border-radius: 50%;
+            top: 2px;
+            left: 4px;
+            border: 1px solid #e0e0e0;
+        }
+        .bunny .ears {
+            position: absolute;
+            top: -2px;
+            left: 3px;
+            width: 10px;
+            height: 6px;
+        }
+        .bunny .ears::before,
+        .bunny .ears::after {
+            content: '';
+            position: absolute;
+            width: 3px;
+            height: 8px;
+            background-color: #f5f5f5;
+            border-radius: 50% 50% 50% 50% / 80% 80% 20% 20%;
+            top: 0;
+        }
+        .bunny .ears::before { left: 1px; }
+        .bunny .ears::after { right: 1px; }
+
+        @keyframes sway {
+            0%, 100% { transform: rotate(-2deg); }
+            50% { transform: rotate(2deg); }
+        }
+
+        @keyframes hop {
+            0% { transform: translateX(0px) scaleX(1); }
+            25% { transform: translateX(15px) scaleX(1); }
+            50% { transform: translateX(30px) scaleX(-1); }
+            75% { transform: translateX(15px) scaleX(-1); }
+            100% { transform: translateX(0px) scaleX(1); }
+        }
+
         .enemy { 
             position: absolute; width: 35px; height: 35px; 
             display: flex; flex-direction: column; align-items: center; 
@@ -2153,22 +2245,32 @@
             enemyEl.classList.add('enemy');
             enemyEl.id = `enemy-${enemyIdCounter}`;
             
-            // Add type-specific class
-            if (enemyType === 'armoredCyclops') {
-                enemyEl.classList.add('armored-cyclops');
-            }
-            
             const startPos = getPositionOnPath(0);
             enemyEl.style.left = `${startPos.x - enemyStats.width/2}px`;
             enemyEl.style.top = `${startPos.y - enemyStats.height/2}px`;
             
-            // Create eyeball structure
-            const eyeball = document.createElement('div');
-            eyeball.classList.add('enemy-eyeball');
-            const iris = document.createElement('div');
-            iris.classList.add('enemy-iris');
-            eyeball.appendChild(iris);
-            enemyEl.appendChild(eyeball);
+            // Add type-specific class and create structure
+            if (enemyType === 'armoredCyclops') {
+                enemyEl.classList.add('armored-cyclops');
+                
+                // Create single eyeball structure
+                const eyeball = document.createElement('div');
+                eyeball.classList.add('enemy-eyeball');
+                const iris = document.createElement('div');
+                iris.classList.add('enemy-iris');
+                eyeball.appendChild(iris);
+                enemyEl.appendChild(eyeball);
+            } else {
+                enemyEl.classList.add('normal');
+                
+                // Create single eyeball structure
+                const eyeball = document.createElement('div');
+                eyeball.classList.add('enemy-eyeball');
+                const iris = document.createElement('div');
+                iris.classList.add('enemy-iris');
+                eyeball.appendChild(iris);
+                enemyEl.appendChild(eyeball);
+            }
             
             // Create health bar
             const healthBar = document.createElement('div');
@@ -2180,10 +2282,9 @@
             
             gameContainer.appendChild(enemyEl);
             
-            enemies.push({
+            const enemyObj = {
                 id: enemyIdCounter,
                 el: enemyEl,
-                irisEl: iris,
                 type: enemyType,
                 x: startPos.x,
                 y: startPos.y,
@@ -2202,7 +2303,12 @@
                     slowMultiplier: 1.0,
                     slowEndTime: 0
                 }
-            });
+            };
+            
+            // Add iris reference for all enemies
+            enemyObj.irisEl = enemyEl.querySelector('.enemy-iris');
+            
+            enemies.push(enemyObj);
         }
         
         // Update game UI
@@ -2895,9 +3001,95 @@
             }
         }
         
+        // Spawn decorative elements
+        function spawnFlowers() {
+            const flowerColors = ['yellow', 'pink', 'purple', 'white'];
+            const flowerCount = 20;
+            
+            for (let i = 0; i < flowerCount; i++) {
+                const flower = document.createElement('div');
+                flower.className = `flower ${flowerColors[Math.floor(Math.random() * flowerColors.length)]}`;
+                
+                // Random position avoiding the path
+                let x, y;
+                let validPosition = false;
+                let attempts = 0;
+                
+                while (!validPosition && attempts < 50) {
+                    x = Math.random() * (gameWidth - 20);
+                    y = Math.random() * (gameHeight - 20);
+                    
+                    // Check if position is away from path
+                    validPosition = true;
+                    for (let j = 0; j < pathWaypoints.length - 1; j++) {
+                        const start = pathWaypoints[j];
+                        const end = pathWaypoints[j + 1];
+                        const dist = distanceToLineSegment(x, y, start.x, start.y, end.x, end.y);
+                        if (dist < 40) {
+                            validPosition = false;
+                            break;
+                        }
+                    }
+                    attempts++;
+                }
+                
+                if (validPosition) {
+                    flower.style.left = `${x}px`;
+                    flower.style.top = `${y}px`;
+                    flower.style.animationDelay = `${Math.random() * 3}s`;
+                    gameContainer.appendChild(flower);
+                }
+            }
+        }
+        
+        function spawnBunnies() {
+            const bunnyCount = 6;
+            
+            for (let i = 0; i < bunnyCount; i++) {
+                const bunny = document.createElement('div');
+                bunny.className = 'bunny';
+                
+                const ears = document.createElement('div');
+                ears.className = 'ears';
+                bunny.appendChild(ears);
+                
+                // Random position avoiding the path
+                let x, y;
+                let validPosition = false;
+                let attempts = 0;
+                
+                while (!validPosition && attempts < 50) {
+                    x = Math.random() * (gameWidth - 30);
+                    y = Math.random() * (gameHeight - 30);
+                    
+                    // Check if position is away from path
+                    validPosition = true;
+                    for (let j = 0; j < pathWaypoints.length - 1; j++) {
+                        const start = pathWaypoints[j];
+                        const end = pathWaypoints[j + 1];
+                        const dist = distanceToLineSegment(x, y, start.x, start.y, end.x, end.y);
+                        if (dist < 50) {
+                            validPosition = false;
+                            break;
+                        }
+                    }
+                    attempts++;
+                }
+                
+                if (validPosition) {
+                    bunny.style.left = `${x}px`;
+                    bunny.style.top = `${y}px`;
+                    bunny.style.animationDelay = `${Math.random() * 2}s`;
+                    gameContainer.appendChild(bunny);
+                }
+            }
+        }
+
         // Initialize game
         document.addEventListener('DOMContentLoaded', () => {
             createPath();
+            spawnFlowers();
+            spawnBunnies();
             initializeTowers();
             setupControls();
             setupTowerPalette();
